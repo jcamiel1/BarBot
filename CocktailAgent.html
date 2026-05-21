@@ -32,8 +32,8 @@
       border: 1px solid #5a3010;
     }
     .msg { margin-bottom: 14px; line-height: 1.5; }
-    .msg.agent { color: #f5e6c8; }
-    .msg.user  { color: #d4a843; text-align: right; font-style: italic; }
+    .msg.agent  { color: #f5e6c8; }
+    .msg.user   { color: #d4a843; text-align: right; font-style: italic; }
     .msg.system { color: #a08060; font-size: 0.85rem; text-align: center; }
     #buttons {
       display: flex;
@@ -55,12 +55,18 @@
       font-weight: bold;
       flex: 1;
       min-width: 100px;
-      touch-action: manipulation; /* better iPad tap response */
+      touch-action: manipulation;
     }
     button:hover  { background: #e8bf6a; }
     button:active { background: #b8922e; }
     button:disabled { background: #5a3010; color: #a08060; cursor: not-allowed; }
-    #status { font-size: 0.8rem; color: #a08060; max-width: 600px; text-align: center; }
+    #status {
+      font-size: 0.8rem;
+      color: #a08060;
+      max-width: 600px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
@@ -71,7 +77,6 @@
   <div id="status">Initializing…</div>
 
   <script>
-    // Points to the local proxy — works on iPad when on the same WiFi
     const API_BASE = window.location.origin + '/v1';
 
     let sessionId   = null;
@@ -176,12 +181,24 @@
     }
 
     function printTicket(inp) {
-      // Replace this with a call to your local print service for the Ongta printer
+      // Replace console.log with your Ongta print service call when ready
+      console.log('PRINT TICKET', inp);
       addMsg(
         `🖨️ Order sent to printer — ${inp.customer_order} | ${inp.ingredients}${inp.notes ? ' | ' + inp.notes : ''}`,
         'system'
       );
-      console.log('PRINT TICKET', inp);
+
+      // Auto-reset for next customer
+      addMsg('✅ Enjoy your drink! Starting over in 5 seconds…', 'system');
+      let countdown = 5;
+      const timer = setInterval(() => {
+        countdown--;
+        setStatus(`New customer starting in ${countdown}…`);
+        if (countdown <= 0) {
+          clearInterval(timer);
+          location.reload();
+        }
+      }, 1000);
     }
 
     async function sendUserMessage(text) {
@@ -206,7 +223,16 @@
         await sendEvent('user.message', {
           content: [{ type: 'text', text: 'Hello' }],
         });
-        pollEvents();
+        // Poll with retries until opening message appears
+        let attempts = 0;
+        const waitForOpen = async () => {
+          await pollEvents();
+          attempts++;
+          if (!document.querySelector('.msg.agent') && attempts < 10) {
+            setTimeout(waitForOpen, 1000);
+          }
+        };
+        setTimeout(waitForOpen, 1500);
       } catch (e) {
         setStatus('Failed to start session. Is the server running?');
         console.error(e);
