@@ -211,35 +211,35 @@
       setTimeout(pollEvents, 600);
     }
 
-    async function init() {
-      setStatus('Starting session…');
-      try {
-        const sess = await apiCall('/sessions', 'POST', {
-          agent:          'agt_01PG4WqkBHrdAd2fR1PZoqjk',
-          environment_id: 'env_017SzWsnyUrrCJMjmccoCpt3',
-        });
-        sessionId = sess.id;
-        setStatus('Ready!');
-        await sendEvent('user.message', {
-          content: [{ type: 'text', text: 'Hello' }],
-        });
-        // Poll with retries until opening message appears
-        let attempts = 0;
-        const waitForOpen = async () => {
-          await pollEvents();
-          attempts++;
-          if (!document.querySelector('.msg.agent') && attempts < 10) {
-            setTimeout(waitForOpen, 1000);
-          }
-        };
-        setTimeout(waitForOpen, 1500);
-      } catch (e) {
-        setStatus('Failed to start session. Is the server running?');
-        console.error(e);
-      }
-    }
+   function showBeginButton() {
+  clearButtons();
+  const btn = document.createElement('button');
+  btn.textContent = '🍹 Begin';
+  btn.style.fontSize = '1.3rem';
+  btn.style.padding = '18px 40px';
+  btn.onclick = () => {
+    clearButtons();
+    sendUserMessage('Begin');
+  };
+  buttons.appendChild(btn);
+  setStatus('Tap Begin to get started!');
+}
 
-    init();
+async function init() {
+  setStatus('Starting session…');
+  try {
+    const sess = await apiCall('/sessions', 'POST', {
+      agent:          'agt_01PG4WqkBHrdAd2fR1PZoqjk',
+      environment_id: 'env_017SzWsnyUrrCJMjmccoCpt3',
+    });
+    sessionId = sess.id;
+    // Show Begin button immediately — no waiting for agent
+    showBeginButton();
+  } catch (e) {
+    setStatus('Failed to start session. Is the server running?');
+    console.error(e);
+  }
+}
   </script>
 </body>
 </html>
