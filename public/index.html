@@ -17,10 +17,14 @@
     #chat-header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #3d2200; margin-bottom: 16px; }
     #chat-header h2 { font-size: 1.4rem; color: #f5c842; letter-spacing: 1px; }
     #messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; }
-    .message { max-width: 85%; padding: 12px 16px; border-radius: 6px; line-height: 1.6; font-size: 0.97rem; }
+    .message { max-width: 85%; padding: 12px 16px; border-radius: 6px; line-height: 1.6; font-size: 0.97rem; white-space: pre-wrap; }
     .message.agent { background: #2e1500; border: 1px solid #5c3010; align-self: flex-start; color: #f5e6c8; }
     .message.user { background: #f5c842; color: #1a0a00; align-self: flex-end; font-weight: 500; }
     .message.system { background: transparent; color: #8a7250; font-style: italic; font-size: 0.85rem; align-self: center; border: none; padding: 4px 0; }
+    .options-wrap { align-self: flex-start; display: flex; flex-direction: column; gap: 8px; max-width: 85%; }
+    .option-btn { background: #3d1800; border: 1px solid #f5c842; color: #f5c842; padding: 10px 16px; border-radius: 4px; font-family: 'Georgia', serif; font-size: 0.95rem; cursor: pointer; text-align: left; transition: background 0.2s; }
+    .option-btn:hover { background: #5c2800; }
+    .option-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; }
     .typing span { width: 8px; height: 8px; background: #f5c842; border-radius: 50%; animation: bounce 1s infinite; }
     .typing span:nth-child(2) { animation-delay: 0.15s; }
@@ -52,7 +56,7 @@
   <div id="chat-header"><h2>🍹 Cocktail Sommelier</h2></div>
   <div id="messages"></div>
   <div id="input-area">
-    <textarea id="user-input" rows="2" placeholder="Type your answer..." onkeydown="handleKey(event)"></textarea>
+    <textarea id="user-input" rows="2" placeholder="Or type a note..." onkeydown="handleKey(event)"></textarea>
     <button id="send-btn" onclick="sendMessage()">Send</button>
   </div>
 </div>
@@ -77,7 +81,7 @@
   const BACKEND_URL = '/api/cocktail';
   let sessionId = null;
   let polling = false;
-  let globalLastTs = null;  // persists across all poll cycles
+  let globalLastTs = null;
 
   async function beginSession() {
     const btn = document.getElementById('begin-btn');
@@ -90,7 +94,7 @@
       sessionId = data.session_id;
       document.getElementById('start-screen').style.display = 'none';
       document.getElementById('chat-screen').style.display = 'flex';
-      await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Start' }] });
+      await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Hello' }] });
       pollEvents();
     } catch (err) {
       btn.disabled = false;
@@ -107,7 +111,16 @@
     input.value = '';
     addMessage('user', text);
     setSendDisabled(true);
+    disableOptions();
     await postEvent({ type: 'user.message', content: [{ type: 'text', text: text }] });
+    pollEvents();
+  }
+
+  async function sendOption(number, label) {
+    addMessage('user', number + '. ' + label);
+    setSendDisabled(true);
+    disableOptions();
+    await postEvent({ type: 'user.message', content: [{ type: 'text', text: String(number) }] });
     pollEvents();
   }
 
@@ -136,7 +149,6 @@
         const url = BACKEND_URL + '/events?session_id=' + sessionId + (globalLastTs ? '&after_ts=' + encodeURIComponent(globalLastTs) : '');
         const res = await fetch(url);
         const data = await res.json();
-
         for (var i = 0; i < (data.events || []).length; i++) {
           var ev = data.events[i];
           if (ev.type === 'agent.message') {
@@ -155,9 +167,7 @@
           }
           if (ev.type === 'session.status_idle') { idle = true; }
         }
-
         if (data.last_ts) globalLastTs = data.last_ts;
-
       } catch (err) {
         console.error(err);
         idle = true;
@@ -165,9 +175,62 @@
     }
 
     showTyping(false);
-    if (agentText) addMessage('agent', agentText);
+    if (agentText) renderMessage(agentText);
     setSendDisabled(false);
     polling = false;
+  }
+
+  function cleanText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      .replace(/^#{1,6}\s/gm, '')
+      .trim();
+  }
+
+  function renderMessage(rawText) {
+    var text = cleanText(rawText);
+    var lines = text.split('\n');
+    var questionLines = [];
+    var optionLines = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (/^[1-4]\.\s/.test(line)) {
+        optionLines.push(line);
+      } else {
+        questionLines.push(lines[i]);
+      }
+    }
+
+    var questionText = questionLines.join('\n').trim();
+    if (questionText) addMessage('agent', questionText);
+
+    if (optionLines.length > 0) {
+      var wrap = document.createElement('div');
+      wrap.className = 'options-wrap';
+      for (var k = 0; k < optionLines.length; k++) {
+        var match = optionLines[k].match(/^([1-4])\.\s(.+)/);
+        if (match) {
+          (function(num, label) {
+            var btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = num + '. ' + label;
+            btn.onclick = function() { sendOption(num, label); };
+            wrap.appendChild(btn);
+          })(match[1], match[2]);
+        }
+      }
+      document.getElementById('messages').appendChild(wrap);
+      document.getElementById('messages').scrollTop = 9999;
+    }
+  }
+
+  function disableOptions() {
+    var btns = document.querySelectorAll('.option-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
   }
 
   function handleTicket(input) {
@@ -186,22 +249,11 @@
   function closeTicket() {
     document.getElementById('ticket-overlay').style.display = 'none';
   }
-  
-  function cleanText(text) {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/__(.*?)__/g, '$1')
-      .replace(/_(.*?)_/g, '$1')
-      .replace(/^#{1,6}\s/gm, '')
-      .replace(/ — /g, ' - ')
-      .trim();
-  }
 
   function addMessage(role, text) {
     var div = document.createElement('div');
     div.className = 'message ' + role;
-    div.textContent = cleanText(text);
+    div.textContent = text;
     document.getElementById('messages').appendChild(div);
     document.getElementById('messages').scrollTop = 9999;
   }
