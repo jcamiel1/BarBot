@@ -39,21 +39,16 @@ app.post('/api/cocktail/event', async (req, res) => {
 
 // 3. Poll for events
 app.get('/api/cocktail/events', async (req, res) => {
-  const { session_id, page } = req.query;
+  const { session_id, after_id } = req.query;
   try {
-    const result = await anthropic.beta.sessions.events.list(session_id, {
-      page: parseInt(page) || 1,
-    });
-    res.json({ events: result.data, next_page: result.next_page || null });
+    const params = { limit: 100 };
+    if (after_id) params.after_id = after_id;
+    const result = await anthropic.beta.sessions.events.list(session_id, params);
+    res.json({ events: result.data, last_id: result.data.length > 0 ? result.data[result.data.length - 1].id : after_id || null });
   } catch (err) {
     console.error('POLL ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/', (req, re
