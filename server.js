@@ -1,59 +1,55 @@
-const http  = require('http');
-const https = require('https');
-const fs    = require('fs');
-const path  = require('path');
+const express = require('express');
+const Anthropic = require('@anthropic-ai/sdk');
+const path = require('path');
 
-const API_KEY  = process.env.API_KEY;
-const PORT     = process.env.PORT || 3000;
+const app = express();
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const AGENT_ID       = process.env.AGENT_ID;
+const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 
-  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
-
-  if (req.url === '/' || req.url === '/index.html') {
-    fs.readFile(path.join(__dirname, 'cocktail-recommender.html'), (err, data) => {
-      if (err) { res.writeHead(404); res.end('Not found'); return; }
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
+// 1. Create a session
+app.post('/api/cocktail/session', async (req, res) => {
+  try {
+    const session = await anthropic.beta.sessions.create({
+      agent: AGENT_ID,
+      environment_id: ENVIRONMENT_ID,
+      title: 'Cocktail Order',
     });
-    return;
+    res.json({ session_id: session.id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
-
-  if (req.url.startsWith('/v1/')) {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const options = {
-        hostname: 'api.anthropic.com',
-        path: req.url,
-        method: req.method,
-        headers: {
-          'Content-Type':      'application/json',
-          'x-api-key':         API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-beta':    'managed-agents-2026-04-01',
-        },
-      };
-      const proxy = https.request(options, apiRes => {
-        res.writeHead(apiRes.statusCode, { 'Content-Type': 'application/json' });
-        apiRes.pipe(res);
-      });
-      proxy.on('error', e => {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: e.message }));
-      });
-      if (body) proxy.write(body);
-      proxy.end();
-    });
-    return;
-  }
-
-  res.writeHead(404); res.end('Not found');
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🍹 Cocktail Bar running on port ${PORT}`);
+// 2. Send an event to a session
+app.post('/api/cocktail/event', async (req, res) => {
+  const { session_id, event } = req.body;
+  try {
+    await anthropic.beta.sessions.events.send(session_id, { events: [event] });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
+
+// 3. Poll for events
+app.get('/api/cocktail/events', async (req, res) => {
+  const { session_id, page } = req.query;
+  try {
+    const result = await anthropic.beta.sessions.events.list(session_id, {
+      page: parseInt(page) || 1,
+    });
+    res.json({ events: result.data, next_page: result.next_page || null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
