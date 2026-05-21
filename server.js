@@ -20,7 +20,7 @@ app.post('/api/cocktail/session', async (req, res) => {
     });
     res.json({ session_id: session.id });
   } catch (err) {
-    console.error(err);
+    console.error('SESSION ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -32,23 +32,11 @@ app.post('/api/cocktail/event', async (req, res) => {
     await anthropic.beta.sessions.events.send(session_id, { events: [event] });
     res.json({ ok: true });
   } catch (err) {
-    console.error(err);
+    console.error('EVENT ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
-app.post('/api/cocktail/session', async (req, res) => {
-  try {
-    const session = await anthropic.beta.sessions.create({
-      agent: AGENT_ID,
-      environment_id: ENVIRONMENT_ID,
-      title: 'Cocktail Order',
-    });
-    res.json({ session_id: session.id });
-  } catch (err) {
-    console.error('SESSION ERROR:', JSON.stringify(err.message));
-    res.status(500).json({ error: err.message });
-  }
-});
+
 // 3. Poll for events
 app.get('/api/cocktail/events', async (req, res) => {
   const { session_id, page } = req.query;
@@ -58,10 +46,14 @@ app.get('/api/cocktail/events', async (req, res) => {
     });
     res.json({ events: result.data, next_page: result.next_page || null });
   } catch (err) {
-    console.error(err);
+    console.error('POLL ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-const PORT = process.env.PORT || 3000;
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
