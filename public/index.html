@@ -320,14 +320,15 @@
     polling = true;
     showTyping(true);
 
-    let lastPage = 1;
+    let lastId = null;
     let idle = false;
     let agentText = '';
 
     while (!idle) {
       await sleep(1000);
       try {
-        const res = await fetch(`${BACKEND_URL}/events?session_id=${sessionId}&page=${lastPage}`);
+        const url = `${BACKEND_URL}/events?session_id=${sessionId}${lastId ? `&after_id=${lastId}` : ''}`;
+        const res = await fetch(url);
         const data = await res.json();
 
         for (const ev of (data.events || [])) {
@@ -350,7 +351,7 @@
           }
         }
 
-        if (data.next_page) lastPage = data.next_page;
+        if (data.last_id) lastId = data.last_id;
 
       } catch (err) {
         console.error(err);
