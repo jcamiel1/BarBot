@@ -186,11 +186,22 @@
   function closeTicket() {
     document.getElementById('ticket-overlay').style.display = 'none';
   }
+  
+  function cleanText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      .replace(/^#{1,6}\s/gm, '')
+      .replace(/ — /g, ' - ')
+      .trim();
+  }
 
   function addMessage(role, text) {
     var div = document.createElement('div');
     div.className = 'message ' + role;
-    div.textContent = text;
+    div.textContent = cleanText(text);
     document.getElementById('messages').appendChild(div);
     document.getElementById('messages').scrollTop = 9999;
   }
