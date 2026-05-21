@@ -6,235 +6,56 @@
   <title>Cocktail Recommender</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Georgia', serif;
-      background: #1a0a00;
-      color: #f5e6c8;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #start-screen {
-      text-align: center;
-      padding: 40px;
-    }
-
-    #start-screen h1 {
-      font-size: 2.4rem;
-      color: #f5c842;
-      margin-bottom: 12px;
-      letter-spacing: 2px;
-    }
-
-    #start-screen p {
-      font-size: 1.1rem;
-      color: #c9a97a;
-      margin-bottom: 36px;
-    }
-
-    #begin-btn {
-      background: #f5c842;
-      color: #1a0a00;
-      border: none;
-      padding: 16px 48px;
-      font-size: 1.2rem;
-      font-family: 'Georgia', serif;
-      font-weight: bold;
-      border-radius: 4px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: background 0.2s;
-    }
-
+    body { font-family: 'Georgia', serif; background: #1a0a00; color: #f5e6c8; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    #start-screen { text-align: center; padding: 40px; }
+    #start-screen h1 { font-size: 2.4rem; color: #f5c842; margin-bottom: 12px; letter-spacing: 2px; }
+    #start-screen p { font-size: 1.1rem; color: #c9a97a; margin-bottom: 36px; }
+    #begin-btn { background: #f5c842; color: #1a0a00; border: none; padding: 16px 48px; font-size: 1.2rem; font-family: 'Georgia', serif; font-weight: bold; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: background 0.2s; }
     #begin-btn:hover { background: #ffd966; }
     #begin-btn:disabled { background: #8a7230; cursor: not-allowed; }
-
-    #chat-screen {
-      display: none;
-      flex-direction: column;
-      width: 100%;
-      max-width: 600px;
-      height: 100vh;
-      padding: 20px;
-    }
-
-    #chat-header {
-      text-align: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #3d2200;
-      margin-bottom: 16px;
-    }
-
-    #chat-header h2 {
-      font-size: 1.4rem;
-      color: #f5c842;
-      letter-spacing: 1px;
-    }
-
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding-right: 4px;
-    }
-
-    .message {
-      max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 6px;
-      line-height: 1.6;
-      font-size: 0.97rem;
-    }
-
-    .message.agent {
-      background: #2e1500;
-      border: 1px solid #5c3010;
-      align-self: flex-start;
-      color: #f5e6c8;
-    }
-
-    .message.user {
-      background: #f5c842;
-      color: #1a0a00;
-      align-self: flex-end;
-      font-weight: 500;
-    }
-
-    .message.system {
-      background: transparent;
-      color: #8a7250;
-      font-style: italic;
-      font-size: 0.85rem;
-      align-self: center;
-      border: none;
-      padding: 4px 0;
-    }
-
-    .typing {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 12px 16px;
-    }
-
-    .typing span {
-      width: 8px; height: 8px;
-      background: #f5c842;
-      border-radius: 50%;
-      animation: bounce 1s infinite;
-    }
+    #chat-screen { display: none; flex-direction: column; width: 100%; max-width: 600px; height: 100vh; padding: 20px; }
+    #chat-header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #3d2200; margin-bottom: 16px; }
+    #chat-header h2 { font-size: 1.4rem; color: #f5c842; letter-spacing: 1px; }
+    #messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; }
+    .message { max-width: 85%; padding: 12px 16px; border-radius: 6px; line-height: 1.6; font-size: 0.97rem; }
+    .message.agent { background: #2e1500; border: 1px solid #5c3010; align-self: flex-start; color: #f5e6c8; }
+    .message.user { background: #f5c842; color: #1a0a00; align-self: flex-end; font-weight: 500; }
+    .message.system { background: transparent; color: #8a7250; font-style: italic; font-size: 0.85rem; align-self: center; border: none; padding: 4px 0; }
+    .typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; }
+    .typing span { width: 8px; height: 8px; background: #f5c842; border-radius: 50%; animation: bounce 1s infinite; }
     .typing span:nth-child(2) { animation-delay: 0.15s; }
     .typing span:nth-child(3) { animation-delay: 0.3s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-6px); }
-    }
-
-    #input-area {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #3d2200;
-    }
-
-    #user-input {
-      flex: 1;
-      background: #2e1500;
-      border: 1px solid #5c3010;
-      color: #f5e6c8;
-      padding: 12px 14px;
-      border-radius: 4px;
-      font-size: 0.97rem;
-      font-family: 'Georgia', serif;
-      resize: none;
-      outline: none;
-    }
-
+    @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+    #input-area { display: flex; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #3d2200; }
+    #user-input { flex: 1; background: #2e1500; border: 1px solid #5c3010; color: #f5e6c8; padding: 12px 14px; border-radius: 4px; font-size: 0.97rem; font-family: 'Georgia', serif; resize: none; outline: none; }
     #user-input:focus { border-color: #f5c842; }
-
-    #send-btn {
-      background: #f5c842;
-      color: #1a0a00;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      font-family: 'Georgia', serif;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
+    #send-btn { background: #f5c842; color: #1a0a00; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; font-family: 'Georgia', serif; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
     #send-btn:hover { background: #ffd966; }
     #send-btn:disabled { background: #8a7230; cursor: not-allowed; }
-
-    #ticket-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
-
-    #ticket {
-      background: #fff;
-      color: #111;
-      font-family: 'Courier New', monospace;
-      padding: 32px 28px;
-      border-radius: 4px;
-      width: 320px;
-      text-align: center;
-    }
-
+    #ticket-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; }
+    #ticket { background: #fff; color: #111; font-family: 'Courier New', monospace; padding: 32px 28px; border-radius: 4px; width: 320px; text-align: center; }
     #ticket h3 { font-size: 1.1rem; margin-bottom: 8px; }
     #ticket .divider { border-top: 1px dashed #999; margin: 12px 0; }
     #ticket .label { font-size: 0.75rem; color: #666; text-transform: uppercase; }
     #ticket .value { font-size: 1rem; font-weight: bold; margin-bottom: 8px; }
     #ticket .notes { font-size: 0.85rem; color: #444; }
-
-    #close-ticket {
-      margin-top: 20px;
-      background: #1a0a00;
-      color: #f5c842;
-      border: none;
-      padding: 10px 28px;
-      font-size: 0.95rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+    #close-ticket { margin-top: 20px; background: #1a0a00; color: #f5c842; border: none; padding: 10px 28px; font-size: 0.95rem; border-radius: 4px; cursor: pointer; }
   </style>
 </head>
 <body>
-
-<!-- Start Screen -->
 <div id="start-screen">
   <h1>🍹 Cocktail Bar</h1>
   <p>Let our sommelier find your perfect drink</p>
   <button id="begin-btn" onclick="beginSession()">Begin</button>
 </div>
-
-<!-- Chat Screen -->
 <div id="chat-screen">
-  <div id="chat-header">
-    <h2>🍹 Cocktail Sommelier</h2>
-  </div>
+  <div id="chat-header"><h2>🍹 Cocktail Sommelier</h2></div>
   <div id="messages"></div>
   <div id="input-area">
     <textarea id="user-input" rows="2" placeholder="Type your answer..." onkeydown="handleKey(event)"></textarea>
     <button id="send-btn" onclick="sendMessage()">Send</button>
   </div>
 </div>
-
-<!-- Order Ticket Overlay -->
 <div id="ticket-overlay">
   <div id="ticket">
     <h3>🍹 ORDER TICKET</h3>
@@ -248,37 +69,28 @@
       <div class="notes" id="ticket-notes"></div>
     </div>
     <div class="divider"></div>
-    <div style="font-size:0.75rem; color:#888;">Thank you — enjoy your drink!</div>
+    <div style="font-size:0.75rem;color:#888;">Thank you — enjoy your drink!</div>
     <button id="close-ticket" onclick="closeTicket()">Close</button>
   </div>
 </div>
-
 <script>
-  // ── Configuration ─────────────────────────────────────────────
   const BACKEND_URL = '/api/cocktail';
-
-  // ── State ─────────────────────────────────────────────────────
   let sessionId = null;
   let polling = false;
 
-  // ── Session start ─────────────────────────────────────────────
   async function beginSession() {
     const btn = document.getElementById('begin-btn');
     btn.disabled = true;
-    btn.textContent = 'Starting…';
-
+    btn.textContent = 'Starting...';
     try {
-      const res = await fetch(`${BACKEND_URL}/session`, { method: 'POST' });
+      const res = await fetch(BACKEND_URL + '/session', { method: 'POST' });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       sessionId = data.session_id;
-
       document.getElementById('start-screen').style.display = 'none';
       document.getElementById('chat-screen').style.display = 'flex';
-
       await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Hello' }] });
       pollEvents();
-
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Retry';
@@ -287,17 +99,14 @@
     }
   }
 
-  // ── Send user message ─────────────────────────────────────────
   async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
     if (!text || !sessionId) return;
-
     input.value = '';
     addMessage('user', text);
     setSendDisabled(true);
-
-    await postEvent({ type: 'user.message', content: [{ type: 'text', text }] });
+    await postEvent({ type: 'user.message', content: [{ type: 'text', text: text }] });
     pollEvents();
   }
 
@@ -305,32 +114,27 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
 
-  // ── Post an event to the session via backend ──────────────────
   async function postEvent(event) {
-    await fetch(`${BACKEND_URL}/event`, {
+    await fetch(BACKEND_URL + '/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId, event })
+      body: JSON.stringify({ session_id: sessionId, event: event })
     });
   }
 
-  // ── Poll for agent response ───────────────────────────────────
   async function pollEvents() {
     if (polling) return;
     polling = true;
     showTyping(true);
-
     let lastTs = null;
     let idle = false;
     let agentText = '';
-
     while (!idle) {
       await sleep(1000);
       try {
-        const url = `${BACKEND_URL}/events?session_id=${sessionId}${lastTs ? `&after_ts=${encodeURIComponent(lastTs)}` : ''}`;
+        const url = BACKEND_URL + '/events?session_id=' + sessionId + (lastTs ? '&after_ts=' + encodeURIComponent(lastTs) : '');
         const res = await fetch(url);
         const data = await res.json();
-
         for (const ev of (data.events || [])) {
           if (ev.type === 'agent.message') {
             for (const block of (ev.content || [])) {
@@ -346,34 +150,26 @@
               is_error: false
             });
           }
-          if (ev.type === 'session.status_idle') {
-            idle = true;
-          }
+          if (ev.type === 'session.status_idle') { idle = true; }
         }
-
         if (data.last_ts) lastTs = data.last_ts;
-
       } catch (err) {
         console.error(err);
         idle = true;
       }
     }
-
     showTyping(false);
     if (agentText) addMessage('agent', agentText);
     setSendDisabled(false);
     polling = false;
   }
 
-  // ── Ticket ────────────────────────────────────────────────────
   function handleTicket(input) {
-    document.getElementById('ticket-order').textContent = input.customer_order || '—';
-    document.getElementById('ticket-ingredients').textContent = input.ingredients || '—';
-    const notesEl = document.getElementById('ticket-notes');
+    document.getElementById('ticket-order').textContent = input.customer_order || '-';
+    document.getElementById('ticket-ingredients').textContent = input.ingredients || '-';
     const notesSec = document.getElementById('ticket-notes-section');
     if (input.notes) {
-      notesEl.textContent = `Note: ${input.notes}`;
-';
+      document.getElementById('ticket-notes').textContent = 'Note: ' + input.notes;
       notesSec.style.display = 'block';
     } else {
       notesSec.style.display = 'none';
@@ -385,10 +181,9 @@
     document.getElementById('ticket-overlay').style.display = 'none';
   }
 
-  // ── UI helpers ────────────────────────────────────────────────
   function addMessage(role, text) {
     const div = document.createElement('div');
-    div.className = `message ${role}`;
+    div.className = 'message ' + role;
     div.textContent = text;
     document.getElementById('messages').appendChild(div);
     document.getElementById('messages').scrollTop = 9999;
@@ -413,7 +208,7 @@
     document.getElementById('user-input').disabled = val;
   }
 
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 </script>
 </body>
 </html>
