@@ -2,261 +2,416 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cocktail Recommender</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Georgia', serif;
       background: #1a0a00;
       color: #f5e6c8;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
     }
-    h1 { font-size: 2rem; margin-bottom: 8px; color: #d4a843; }
-    #subtitle { font-size: 0.9rem; color: #a08060; margin-bottom: 24px; }
-    #chat {
-      width: 100%;
-      max-width: 600px;
-      background: #2a1505;
-      border-radius: 12px;
-      padding: 20px;
-      min-height: 300px;
-      max-height: 60vh;
-      overflow-y: auto;
-      margin-bottom: 16px;
-      border: 1px solid #5a3010;
+
+    #start-screen {
+      text-align: center;
+      padding: 40px;
     }
-    .msg { margin-bottom: 14px; line-height: 1.5; }
-    .msg.agent  { color: #f5e6c8; }
-    .msg.user   { color: #d4a843; text-align: right; font-style: italic; }
-    .msg.system { color: #a08060; font-size: 0.85rem; text-align: center; }
-    #buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      max-width: 600px;
-      width: 100%;
+
+    #start-screen h1 {
+      font-size: 2.4rem;
+      color: #f5c842;
       margin-bottom: 12px;
+      letter-spacing: 2px;
     }
-    button {
-      background: #d4a843;
+
+    #start-screen p {
+      font-size: 1.1rem;
+      color: #c9a97a;
+      margin-bottom: 36px;
+    }
+
+    #begin-btn {
+      background: #f5c842;
       color: #1a0a00;
       border: none;
-      padding: 14px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      font-family: inherit;
+      padding: 16px 48px;
+      font-size: 1.2rem;
+      font-family: 'Georgia', serif;
       font-weight: bold;
-      flex: 1;
-      min-width: 100px;
-      touch-action: manipulation;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s;
     }
-    button:hover  { background: #e8bf6a; }
-    button:active { background: #b8922e; }
-    button:disabled { background: #5a3010; color: #a08060; cursor: not-allowed; }
-    #status {
-      font-size: 0.8rem;
-      color: #a08060;
-      max-width: 600px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    #begin-wrap {
-      max-width: 600px;
+
+    #begin-btn:hover { background: #ffd966; }
+    #begin-btn:disabled { background: #8a7230; cursor: not-allowed; }
+
+    #chat-screen {
+      display: none;
+      flex-direction: column;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-bottom: 12px;
+      max-width: 600px;
+      height: 100vh;
+      padding: 20px;
     }
-    #begin-btn {
+
+    #chat-header {
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #3d2200;
+      margin-bottom: 16px;
+    }
+
+    #chat-header h2 {
       font-size: 1.4rem;
-      padding: 20px 60px;
-      border-radius: 12px;
-      flex: none;
+      color: #f5c842;
+      letter-spacing: 1px;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 4px;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 6px;
+      line-height: 1.6;
+      font-size: 0.97rem;
+    }
+
+    .message.agent {
+      background: #2e1500;
+      border: 1px solid #5c3010;
+      align-self: flex-start;
+      color: #f5e6c8;
+    }
+
+    .message.user {
+      background: #f5c842;
+      color: #1a0a00;
+      align-self: flex-end;
+      font-weight: 500;
+    }
+
+    .message.system {
+      background: transparent;
+      color: #8a7250;
+      font-style: italic;
+      font-size: 0.85rem;
+      align-self: center;
+      border: none;
+      padding: 4px 0;
+    }
+
+    .typing {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 12px 16px;
+    }
+
+    .typing span {
+      width: 8px; height: 8px;
+      background: #f5c842;
+      border-radius: 50%;
+      animation: bounce 1s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+
+    #input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #3d2200;
+    }
+
+    #user-input {
+      flex: 1;
+      background: #2e1500;
+      border: 1px solid #5c3010;
+      color: #f5e6c8;
+      padding: 12px 14px;
+      border-radius: 4px;
+      font-size: 0.97rem;
+      font-family: 'Georgia', serif;
+      resize: none;
+      outline: none;
+    }
+
+    #user-input:focus { border-color: #f5c842; }
+
+    #send-btn {
+      background: #f5c842;
+      color: #1a0a00;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #send-btn:hover { background: #ffd966; }
+    #send-btn:disabled { background: #8a7230; cursor: not-allowed; }
+
+    #ticket-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    #ticket {
+      background: #fff;
+      color: #111;
+      font-family: 'Courier New', monospace;
+      padding: 32px 28px;
+      border-radius: 4px;
+      width: 320px;
+      text-align: center;
+    }
+
+    #ticket h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    #ticket .divider { border-top: 1px dashed #999; margin: 12px 0; }
+    #ticket .label { font-size: 0.75rem; color: #666; text-transform: uppercase; }
+    #ticket .value { font-size: 1rem; font-weight: bold; margin-bottom: 8px; }
+    #ticket .notes { font-size: 0.85rem; color: #444; }
+
+    #close-ticket {
+      margin-top: 20px;
+      background: #1a0a00;
+      color: #f5c842;
+      border: none;
+      padding: 10px 28px;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+
+<!-- Start Screen -->
+<div id="start-screen">
   <h1>🍹 Cocktail Bar</h1>
-  <p id="subtitle">Let us craft your perfect drink</p>
-  <div id="chat"></div>
-  <div id="begin-wrap">
-    <button id="begin-btn" onclick="onBegin()">🍹 Begin</button>
+  <p>Let our sommelier find your perfect drink</p>
+  <button id="begin-btn" onclick="beginSession()">Begin</button>
+</div>
+
+<!-- Chat Screen -->
+<div id="chat-screen">
+  <div id="chat-header">
+    <h2>🍹 Cocktail Sommelier</h2>
   </div>
-  <div id="buttons"></div>
-  <div id="status"></div>
+  <div id="messages"></div>
+  <div id="input-area">
+    <textarea id="user-input" rows="2" placeholder="Type your answer..." onkeydown="handleKey(event)"></textarea>
+    <button id="send-btn" onclick="sendMessage()">Send</button>
+  </div>
+</div>
 
-  <script>
-    const API_BASE = window.location.origin + '/v1';
-    const AGENT_ID = 'agt_01PG4WqkBHrdAd2fR1PZoqjk';
-    const ENV_ID   = 'env_017SzWsnyUrrCJMjmccoCpt3';
+<!-- Order Ticket Overlay -->
+<div id="ticket-overlay">
+  <div id="ticket">
+    <h3>🍹 ORDER TICKET</h3>
+    <div class="divider"></div>
+    <div class="label">Cocktail</div>
+    <div class="value" id="ticket-order"></div>
+    <div class="label">Ingredients</div>
+    <div class="value" id="ticket-ingredients"></div>
+    <div id="ticket-notes-section">
+      <div class="divider"></div>
+      <div class="notes" id="ticket-notes"></div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:0.75rem; color:#888;">Thank you — enjoy your drink!</div>
+    <button id="close-ticket" onclick="closeTicket()">Close</button>
+  </div>
+</div>
 
-    let sessionId   = null;
-    let polling     = false;
-    let lastEventId = null;
-    let sessionReady = false;
+<script>
+  // ── Configuration ─────────────────────────────────────────────
+  const BACKEND_URL = '/api/cocktail';
 
-    const chat      = document.getElementById('chat');
-    const buttons   = document.getElementById('buttons');
-    const status    = document.getElementById('status');
-    const beginWrap = document.getElementById('begin-wrap');
-    const beginBtn  = document.getElementById('begin-btn');
+  // ── State ─────────────────────────────────────────────────────
+  let sessionId = null;
+  let polling = false;
 
-    function addMsg(text, role = 'agent') {
-      const d = document.createElement('div');
-      d.className = `msg ${role}`;
-      d.textContent = text;
-      chat.appendChild(d);
-      chat.scrollTop = chat.scrollHeight;
+  // ── Session start ─────────────────────────────────────────────
+  async function beginSession() {
+    const btn = document.getElementById('begin-btn');
+    btn.disabled = true;
+    btn.textContent = 'Starting…';
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/session`, { method: 'POST' });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      sessionId = data.session_id;
+
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('chat-screen').style.display = 'flex';
+
+      await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Hello' }] });
+      pollEvents();
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Retry';
+      addMessage('system', 'Could not connect. Please try again.');
+      console.error(err);
     }
+  }
 
-    function setStatus(s) { status.textContent = s; }
+  // ── Send user message ─────────────────────────────────────────
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text || !sessionId) return;
 
-    function hideBegin() {
-      beginWrap.style.display = 'none';
-    }
+    input.value = '';
+    addMessage('user', text);
+    setSendDisabled(true);
 
-    function renderButtons(text, onSelect) {
-      buttons.innerHTML = '';
-      const optionRe = /([A-G\d])\)\s+([^\n]+)/g;
-      const opts = [...text.matchAll(optionRe)];
-      if (opts.length === 0) return;
-      opts.forEach(([, key, label]) => {
-        const btn = document.createElement('button');
-        btn.textContent = `${key}) ${label.trim()}`;
-        btn.onclick = () => { clearButtons(); onSelect(key); };
-        buttons.appendChild(btn);
-      });
-    }
+    await postEvent({ type: 'user.message', content: [{ type: 'text', text }] });
+    pollEvents();
+  }
 
-    function clearButtons() { buttons.innerHTML = ''; }
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
 
-    async function apiCall(path, method = 'GET', body = null) {
-      const opts = { method, headers: { 'Content-Type': 'application/json' } };
-      if (body) opts.body = JSON.stringify(body);
-      const res = await fetch(`${API_BASE}${path}`, opts);
-      return res.json();
-    }
+  // ── Post an event to the session via backend ──────────────────
+  async function postEvent(event) {
+    await fetch(`${BACKEND_URL}/event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, event })
+    });
+  }
 
-    async function sendEvent(type, payload = {}) {
-      await apiCall(`/sessions/${sessionId}/events`, 'POST', {
-        events: [{ type, ...payload }],
-      });
-    }
+  // ── Poll for agent response ───────────────────────────────────
+  async function pollEvents() {
+    if (polling) return;
+    polling = true;
+    showTyping(true);
 
-    async function pollEvents() {
-      if (polling) return;
-      polling = true;
+    let lastPage = 1;
+    let idle = false;
+    let agentText = '';
+
+    while (!idle) {
+      await sleep(1000);
       try {
-        const url = `/sessions/${sessionId}/events` + (lastEventId ? `?after_id=${lastEventId}` : '');
-        const data = await apiCall(url);
-        const evts = data.data ?? [];
+        const res = await fetch(`${BACKEND_URL}/events?session_id=${sessionId}&page=${lastPage}`);
+        const data = await res.json();
 
-        for (const ev of evts) {
-          lastEventId = ev.id;
-
-          if (ev.type === 'agent.message' && ev.content) {
-            const text = ev.content.map(b => b.text ?? '').join('');
-            if (text) {
-              addMsg(text, 'agent');
-              renderButtons(text, sendUserMessage);
+        for (const ev of (data.events || [])) {
+          if (ev.type === 'agent.message') {
+            for (const block of (ev.content || [])) {
+              if (block.type === 'text') agentText += block.text;
             }
           }
-
           if (ev.type === 'agent.custom_tool_use' && ev.name === 'print_order_ticket') {
-            printTicket(ev.input ?? {});
-            await sendEvent('user.custom_tool_result', {
+            handleTicket(ev.input);
+            await postEvent({
+              type: 'user.custom_tool_result',
               custom_tool_use_id: ev.id,
               content: [{ type: 'text', text: 'Ticket printed successfully.' }],
-              is_error: false,
+              is_error: false
             });
           }
-
           if (ev.type === 'session.status_idle') {
-            setStatus('Waiting for your selection…');
-            polling = false;
-            return;
-          }
-          if (ev.type === 'session.status_running') {
-            setStatus('Crafting your recommendation…');
+            idle = true;
           }
         }
-      } catch (e) {
-        setStatus('Connection error — retrying…');
-      }
-      polling = false;
-      setTimeout(pollEvents, 800);
-    }
 
-    function printTicket(inp) {
-      console.log('PRINT TICKET', inp);
-      addMsg(
-        `🖨️ Order sent to printer — ${inp.customer_order} | ${inp.ingredients}${inp.notes ? ' | ' + inp.notes : ''}`,
-        'system'
-      );
-      addMsg('✅ Enjoy your drink! Starting over in 5 seconds…', 'system');
-      let countdown = 5;
-      const timer = setInterval(() => {
-        countdown--;
-        setStatus(`New customer starting in ${countdown}…`);
-        if (countdown <= 0) {
-          clearInterval(timer);
-          location.reload();
-        }
-      }, 1000);
-    }
+        if (data.next_page) lastPage = data.next_page;
 
-    async function sendUserMessage(text) {
-      addMsg(text, 'user');
-      setStatus('Crafting your recommendation…');
-      clearButtons();
-      await sendEvent('user.message', {
-        content: [{ type: 'text', text }],
-      });
-      setTimeout(pollEvents, 600);
-    }
-
-    async function onBegin() {
-      hideBegin();
-      setStatus('Starting…');
-      // If session isn't ready yet, wait for it
-      if (!sessionReady) {
-        setStatus('Just a moment…');
-        await new Promise(resolve => {
-          const check = setInterval(() => {
-            if (sessionReady) { clearInterval(check); resolve(); }
-          }, 200);
-        });
-      }
-      await sendUserMessage('Begin');
-    }
-
-    // Pre-create the session silently on page load
-    async function init() {
-      try {
-        const sess = await apiCall('/sessions', 'POST', {
-          agent:          AGENT_ID,
-          environment_id: ENV_ID,
-        });
-        sessionId   = sess.id;
-        sessionReady = true;
-        setStatus('Tap Begin to get started!');
-      } catch (e) {
-        setStatus('Failed to connect. Please refresh the page.');
-        console.error(e);
-        // Re-show begin as a retry button
-        beginBtn.textContent = '🔄 Retry';
-        beginBtn.onclick = () => location.reload();
+      } catch (err) {
+        console.error(err);
+        idle = true;
       }
     }
 
-    init();
-  </script>
+    showTyping(false);
+    if (agentText) addMessage('agent', agentText);
+    setSendDisabled(false);
+    polling = false;
+  }
+
+  // ── Ticket ────────────────────────────────────────────────────
+  function handleTicket(input) {
+    document.getElementById('ticket-order').textContent = input.customer_order || '—';
+    document.getElementById('ticket-ingredients').textContent = input.ingredients || '—';
+    const notesEl = document.getElementById('ticket-notes');
+    const notesSec = document.getElementById('ticket-notes-section');
+    if (input.notes) {
+      notesEl.textContent = `Note: ${input.notes}`;
+      notesSec.style.display = 'block';
+    } else {
+      notesSec.style.display = 'none';
+    }
+    document.getElementById('ticket-overlay').style.display = 'flex';
+  }
+
+  function closeTicket() {
+    document.getElementById('ticket-overlay').style.display = 'none';
+  }
+
+  // ── UI helpers ────────────────────────────────────────────────
+  function addMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.textContent = text;
+    document.getElementById('messages').appendChild(div);
+    document.getElementById('messages').scrollTop = 9999;
+  }
+
+  function showTyping(show) {
+    let t = document.getElementById('typing-indicator');
+    if (show && !t) {
+      t = document.createElement('div');
+      t.id = 'typing-indicator';
+      t.className = 'message agent typing';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      document.getElementById('messages').appendChild(t);
+      document.getElementById('messages').scrollTop = 9999;
+    } else if (!show && t) {
+      t.remove();
+    }
+  }
+
+  function setSendDisabled(val) {
+    document.getElementById('send-btn').disabled = val;
+    document.getElementById('user-input').disabled = val;
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
 </body>
 </html>
