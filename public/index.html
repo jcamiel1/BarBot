@@ -21,11 +21,6 @@
     .message.agent { background: #2e1500; border: 1px solid #5c3010; align-self: flex-start; color: #f5e6c8; }
     .message.user { background: #f5c842; color: #1a0a00; align-self: flex-end; font-weight: 500; }
     .message.system { background: transparent; color: #8a7250; font-style: italic; font-size: 0.85rem; align-self: center; border: none; padding: 4px 0; }
-    .question-text { margin-bottom: 12px; font-size: 0.97rem; }
-    .options-grid { display: flex; flex-direction: column; gap: 8px; }
-    .option-btn { background: #3d1800; border: 1px solid #f5c842; color: #f5c842; padding: 10px 16px; border-radius: 4px; font-family: 'Georgia', serif; font-size: 0.95rem; cursor: pointer; text-align: left; transition: background 0.2s; }
-    .option-btn:hover { background: #5c2800; }
-    .option-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; }
     .typing span { width: 8px; height: 8px; background: #f5c842; border-radius: 50%; animation: bounce 1s infinite; }
     .typing span:nth-child(2) { animation-delay: 0.15s; }
@@ -57,7 +52,7 @@
   <div id="chat-header"><h2>🍹 Cocktail Sommelier</h2></div>
   <div id="messages"></div>
   <div id="input-area">
-    <textarea id="user-input" rows="2" placeholder="Add a note (optional)..." onkeydown="handleKey(event)"></textarea>
+    <textarea id="user-input" rows="2" placeholder="Type your answer..." onkeydown="handleKey(event)"></textarea>
     <button id="send-btn" onclick="sendMessage()">Send</button>
   </div>
 </div>
@@ -82,6 +77,7 @@
   const BACKEND_URL = '/api/cocktail';
   let sessionId = null;
   let polling = false;
+  let globalLastTs = null;  // persists across all poll cycles
 
   async function beginSession() {
     const btn = document.getElementById('begin-btn');
@@ -115,14 +111,6 @@
     pollEvents();
   }
 
-  async function sendOption(label) {
-    addMessage('user', label);
-    setSendDisabled(true);
-    disableAllOptions();
-    await postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
-    pollEvents();
-  }
-
   function handleKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
@@ -139,19 +127,21 @@
     if (polling) return;
     polling = true;
     showTyping(true);
-    let lastTs = null;
     let idle = false;
     let agentText = '';
+
     while (!idle) {
       await sleep(1000);
       try {
-        const url = BACKEND_URL + '/events?session_id=' + sessionId + (lastTs ? '&after_ts=' + encodeURIComponent(lastTs) : '');
+        const url = BACKEND_URL + '/events?session_id=' + sessionId + (globalLastTs ? '&after_ts=' + encodeURIComponent(globalLastTs) : '');
         const res = await fetch(url);
         const data = await res.json();
-        for (const ev of (data.events || [])) {
+
+        for (var i = 0; i < (data.events || []).length; i++) {
+          var ev = data.events[i];
           if (ev.type === 'agent.message') {
-            for (const block of (ev.content || [])) {
-              if (block.type === 'text') agentText += block.text;
+            for (var j = 0; j < (ev.content || []).length; j++) {
+              if (ev.content[j].type === 'text') agentText += ev.content[j].text;
             }
           }
           if (ev.type === 'agent.custom_tool_use' && ev.name === 'print_order_ticket') {
@@ -165,67 +155,19 @@
           }
           if (ev.type === 'session.status_idle') { idle = true; }
         }
-        if (data.last_ts) lastTs = data.last_ts;
+
+        if (data.last_ts) globalLastTs = data.last_ts;
+
       } catch (err) {
         console.error(err);
         idle = true;
       }
     }
+
     showTyping(false);
-    if (agentText) renderAgentMessage(agentText);
+    if (agentText) addMessage('agent', agentText);
     setSendDisabled(false);
     polling = false;
-  }
-
-  function renderAgentMessage(text) {
-    var lines = text.trim().split('\n');
-    var questionLine = '';
-    var options = [];
-    var bodyLines = [];
-    var inOptions = false;
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (line.toUpperCase().startsWith('QUESTION:')) {
-        questionLine = line.replace(/^QUESTION:\s*/i, '');
-        inOptions = true;
-      } else if (inOptions && /^[1-4]\.\s/.test(line)) {
-        options.push(line.replace(/^[1-4]\.\s*/, ''));
-      } else {
-        if (line !== '') inOptions = false;
-        bodyLines.push(lines[i]);
-      }
-    }
-
-    if (bodyLines.join('').trim()) {
-      addMessage('agent', bodyLines.join('\n').trim());
-    }
-
-    if (questionLine && options.length > 0) {
-      var wrapper = document.createElement('div');
-      wrapper.className = 'message agent';
-      var q = document.createElement('div');
-      q.className = 'question-text';
-      q.textContent = questionLine;
-      wrapper.appendChild(q);
-      var grid = document.createElement('div');
-      grid.className = 'options-grid';
-      options.forEach(function(opt) {
-        var btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = opt;
-        btn.onclick = function() { sendOption(opt); };
-        grid.appendChild(btn);
-      });
-      wrapper.appendChild(grid);
-      document.getElementById('messages').appendChild(wrapper);
-      document.getElementById('messages').scrollTop = 9999;
-    }
-  }
-
-  function disableAllOptions() {
-    var btns = document.querySelectorAll('.option-btn');
-    btns.forEach(function(b) { b.disabled = true; });
   }
 
   function handleTicket(input) {
