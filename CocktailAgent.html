@@ -67,25 +67,46 @@
       text-align: center;
       margin-bottom: 12px;
     }
+    #begin-wrap {
+      max-width: 600px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    #begin-btn {
+      font-size: 1.4rem;
+      padding: 20px 60px;
+      border-radius: 12px;
+      flex: none;
+    }
   </style>
 </head>
 <body>
   <h1>🍹 Cocktail Bar</h1>
   <p id="subtitle">Let us craft your perfect drink</p>
   <div id="chat"></div>
+  <div id="begin-wrap">
+    <button id="begin-btn" onclick="onBegin()">🍹 Begin</button>
+  </div>
   <div id="buttons"></div>
-  <div id="status">Initializing…</div>
+  <div id="status"></div>
 
   <script>
     const API_BASE = window.location.origin + '/v1';
+    const AGENT_ID = 'agt_01PG4WqkBHrdAd2fR1PZoqjk';
+    const ENV_ID   = 'env_017SzWsnyUrrCJMjmccoCpt3';
 
     let sessionId   = null;
     let polling     = false;
     let lastEventId = null;
+    let sessionReady = false;
 
-    const chat    = document.getElementById('chat');
-    const buttons = document.getElementById('buttons');
-    const status  = document.getElementById('status');
+    const chat      = document.getElementById('chat');
+    const buttons   = document.getElementById('buttons');
+    const status    = document.getElementById('status');
+    const beginWrap = document.getElementById('begin-wrap');
+    const beginBtn  = document.getElementById('begin-btn');
 
     function addMsg(text, role = 'agent') {
       const d = document.createElement('div');
@@ -97,19 +118,15 @@
 
     function setStatus(s) { status.textContent = s; }
 
+    function hideBegin() {
+      beginWrap.style.display = 'none';
+    }
+
     function renderButtons(text, onSelect) {
       buttons.innerHTML = '';
       const optionRe = /([A-G\d])\)\s+([^\n]+)/g;
       const opts = [...text.matchAll(optionRe)];
-      if (opts.length === 0) {
-        if (/Begin/i.test(text)) {
-          const btn = document.createElement('button');
-          btn.textContent = '🍹 Begin';
-          btn.onclick = () => { clearButtons(); onSelect('Begin'); };
-          buttons.appendChild(btn);
-        }
-        return;
-      }
+      if (opts.length === 0) return;
       opts.forEach(([, key, label]) => {
         const btn = document.createElement('button');
         btn.textContent = `${key}) ${label.trim()}`;
@@ -121,10 +138,7 @@
     function clearButtons() { buttons.innerHTML = ''; }
 
     async function apiCall(path, method = 'GET', body = null) {
-      const opts = {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-      };
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
       if (body) opts.body = JSON.stringify(body);
       const res = await fetch(`${API_BASE}${path}`, opts);
       return res.json();
@@ -181,14 +195,11 @@
     }
 
     function printTicket(inp) {
-      // Replace console.log with your Ongta print service call when ready
       console.log('PRINT TICKET', inp);
       addMsg(
         `🖨️ Order sent to printer — ${inp.customer_order} | ${inp.ingredients}${inp.notes ? ' | ' + inp.notes : ''}`,
         'system'
       );
-
-      // Auto-reset for next customer
       addMsg('✅ Enjoy your drink! Starting over in 5 seconds…', 'system');
       let countdown = 5;
       const timer = setInterval(() => {
@@ -211,35 +222,41 @@
       setTimeout(pollEvents, 600);
     }
 
-   function showBeginButton() {
-  clearButtons();
-  const btn = document.createElement('button');
-  btn.textContent = '🍹 Begin';
-  btn.style.fontSize = '1.3rem';
-  btn.style.padding = '18px 40px';
-  btn.onclick = () => {
-    clearButtons();
-    sendUserMessage('Begin');
-  };
-  buttons.appendChild(btn);
-  setStatus('Tap Begin to get started!');
-}
+    async function onBegin() {
+      hideBegin();
+      setStatus('Starting…');
+      // If session isn't ready yet, wait for it
+      if (!sessionReady) {
+        setStatus('Just a moment…');
+        await new Promise(resolve => {
+          const check = setInterval(() => {
+            if (sessionReady) { clearInterval(check); resolve(); }
+          }, 200);
+        });
+      }
+      await sendUserMessage('Begin');
+    }
 
-async function init() {
-  setStatus('Starting session…');
-  try {
-    const sess = await apiCall('/sessions', 'POST', {
-      agent:          'agt_01PG4WqkBHrdAd2fR1PZoqjk',
-      environment_id: 'env_017SzWsnyUrrCJMjmccoCpt3',
-    });
-    sessionId = sess.id;
-    // Show Begin button immediately — no waiting for agent
-    showBeginButton();
-  } catch (e) {
-    setStatus('Failed to start session. Is the server running?');
-    console.error(e);
-  }
-}
+    // Pre-create the session silently on page load
+    async function init() {
+      try {
+        const sess = await apiCall('/sessions', 'POST', {
+          agent:          AGENT_ID,
+          environment_id: ENV_ID,
+        });
+        sessionId   = sess.id;
+        sessionReady = true;
+        setStatus('Tap Begin to get started!');
+      } catch (e) {
+        setStatus('Failed to connect. Please refresh the page.');
+        console.error(e);
+        // Re-show begin as a retry button
+        beginBtn.textContent = '🔄 Retry';
+        beginBtn.onclick = () => location.reload();
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
