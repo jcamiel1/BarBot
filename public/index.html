@@ -17,7 +17,7 @@
     #chat-header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #3d2200; margin-bottom: 16px; }
     #chat-header h2 { font-size: 1.4rem; color: #f5c842; letter-spacing: 1px; }
     #messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; }
-    .message { max-width: 85%; padding: 12px 16px; border-radius: 6px; line-height: 1.6; font-size: 0.97rem; }
+    .message { max-width: 85%; padding: 12px 16px; border-radius: 6px; line-height: 1.6; font-size: 0.97rem; white-space: pre-wrap; }
     .message.agent { background: #2e1500; border: 1px solid #5c3010; align-self: flex-start; color: #f5e6c8; }
     .message.user { background: #f5c842; color: #1a0a00; align-self: flex-end; font-weight: 500; }
     .message.system { background: transparent; color: #8a7250; font-style: italic; font-size: 0.85rem; align-self: center; border: none; padding: 4px 0; }
@@ -77,7 +77,7 @@
   const BACKEND_URL = '/api/cocktail';
   let sessionId = null;
   let polling = false;
-  let globalLastTs = null;  // persists across all poll cycles
+  let globalLastTs = null;
 
   async function beginSession() {
     const btn = document.getElementById('begin-btn');
@@ -90,8 +90,11 @@
       sessionId = data.session_id;
       document.getElementById('start-screen').style.display = 'none';
       document.getElementById('chat-screen').style.display = 'flex';
-      await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Start' }] });
-      pollEvents();
+
+      // Show question 1 directly — no need to ask the agent
+      addMessage('agent', 'What flavors do you enjoy?\n1. Sweet\n2. Sour and citrusy\n3. Bitter and complex\n4. Smoky and bold');
+      setSendDisabled(false);
+
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Retry';
@@ -186,7 +189,7 @@
   function closeTicket() {
     document.getElementById('ticket-overlay').style.display = 'none';
   }
-  
+
   function cleanText(text) {
     return text
       .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -194,7 +197,6 @@
       .replace(/__(.*?)__/g, '$1')
       .replace(/_(.*?)_/g, '$1')
       .replace(/^#{1,6}\s/gm, '')
-      .replace(/ — /g, ' - ')
       .trim();
   }
 
