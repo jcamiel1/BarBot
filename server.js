@@ -36,7 +36,19 @@ app.post('/api/cocktail/event', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+app.post('/api/cocktail/session', async (req, res) => {
+  try {
+    const session = await anthropic.beta.sessions.create({
+      agent: AGENT_ID,
+      environment_id: ENVIRONMENT_ID,
+      title: 'Cocktail Order',
+    });
+    res.json({ session_id: session.id });
+  } catch (err) {
+    console.error('SESSION ERROR:', JSON.stringify(err.message));
+    res.status(500).json({ error: err.message });
+  }
+});
 // 3. Poll for events
 app.get('/api/cocktail/events', async (req, res) => {
   const { session_id, page } = req.query;
