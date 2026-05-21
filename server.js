@@ -38,11 +38,14 @@ app.post('/api/cocktail/event', async (req, res) => {
 app.get('/api/cocktail/events', async (req, res) => {
   const { session_id, after_ts } = req.query;
   try {
-    const params = { limit: 100 };
-    if (after_ts) params['created_at[gt]'] = after_ts;
-    const result = await anthropic.beta.sessions.events.list(session_id, params);
-    const lastTs = result.data.length > 0 ? result.data[result.data.length - 1].processed_at : (after_ts || null);
-    res.json({ events: result.data, last_ts: lastTs });
+    const result = await anthropic.beta.sessions.events.list(session_id, {
+      limit: 100,
+      order: 'asc',
+      ...(after_ts ? { 'created_at[gt]': after_ts } : {})
+    });
+    const events = result.data || [];
+    const lastTs = events.length > 0 ? events[events.length - 1].processed_at : (after_ts || null);
+    res.json({ events: events, last_ts: lastTs });
   } catch (err) {
     console.error('POLL ERROR:', err.message);
     res.status(500).json({ error: err.message });
