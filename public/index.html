@@ -247,7 +247,29 @@
   }
 
   function closeTicket() {
+    // Hide the ticket overlay
     document.getElementById('ticket-overlay').style.display = 'none';
+
+    // Reset state
+    sessionId = null;
+    polling = false;
+    globalLastTs = null;
+
+    // Clear messages
+    document.getElementById('messages').innerHTML = '';
+
+    // Reset inputs
+    document.getElementById('user-input').value = '';
+    setSendDisabled(false);
+
+    // Reset begin button
+    var btn = document.getElementById('begin-btn');
+    btn.disabled = false;
+    btn.textContent = 'Begin';
+
+    // Swap screens
+    document.getElementById('chat-screen').style.display = 'none';
+    document.getElementById('start-screen').style.display = 'block';
   }
 
   function addMessage(role, text) {
@@ -272,7 +294,7 @@
     }
   }
 
-function setSendDisabled(val) {
+  function setSendDisabled(val) {
     document.getElementById('send-btn').disabled = val;
     document.getElementById('user-input').disabled = val;
   }
