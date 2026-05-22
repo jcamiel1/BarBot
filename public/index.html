@@ -198,7 +198,7 @@
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
-      if (/^[1-4]\.\s/.test(line)) {
+      if (/^\d+\.\s/.test(line)) {
         optionLines.push(line);
       } else {
         questionLines.push(lines[i]);
@@ -212,7 +212,7 @@
       var wrap = document.createElement('div');
       wrap.className = 'options-wrap';
       for (var k = 0; k < optionLines.length; k++) {
-        var match = optionLines[k].match(/^([1-4])\.\s(.+)/);
+        var match = optionLines[k].match(/^(\d+)\.\s(.+)/);
         if (match) {
           (function(num, label) {
             var btn = document.createElement('button');
@@ -272,7 +272,7 @@
     }
   }
 
-  function setSendDisabled(val) {
+function setSendDisabled(val) {
     document.getElementById('send-btn').disabled = val;
     document.getElementById('user-input').disabled = val;
   }
