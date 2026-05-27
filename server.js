@@ -15,16 +15,18 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const AGENT_ID = process.env.AGENT_ID;
 const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 
-app.post('/api/cocktail/session', async (req, res) => {
+app.get('/api/cocktail/events', async (req, res) => {
+  const { session_id, after_id } = req.query;
   try {
-    const session = await anthropic.beta.sessions.create({
-      agent: AGENT_ID,
-      environment_id: ENVIRONMENT_ID,
-      title: 'Cocktail Order',
+    const result = await anthropic.beta.sessions.events.list(session_id, {
+      limit: 100,
+      ...(after_id ? { after_id: after_id } : {})
     });
-    res.json({ session_id: session.id });
+    const events = result.data || [];
+    const lastId = events.length > 0 ? events[events.length - 1].id : (after_id || null);
+    res.json({ events: events, last_id: lastId });
   } catch (err) {
-    console.error('SESSION ERROR:', err.message);
+    console.error('POLL ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
