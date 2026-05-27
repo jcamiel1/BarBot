@@ -1,4 +1,5 @@
 const express = require('express');
+const Anthropic = require('@anthropic-ai/sdk');
 const path = require('path');
 
 const app = express();
@@ -15,18 +16,16 @@ const anthropic = new Anthropic({
 const AGENT_ID = process.env.AGENT_ID;
 const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 
-app.get('/api/cocktail/events', async (req, res) => {
-  const { session_id, after_id } = req.query;
+app.post('/api/cocktail/session', async (req, res) => {
   try {
-    const result = await anthropic.beta.sessions.events.list(session_id, {
-      limit: 100,
-      ...(after_id ? { after_id: after_id } : {})
+    const session = await anthropic.beta.sessions.create({
+      agent: AGENT_ID,
+      environment_id: ENVIRONMENT_ID,
+      title: 'Cocktail Order',
     });
-    const events = result.data || [];
-    const lastId = events.length > 0 ? events[events.length - 1].id : (after_id || null);
-    res.json({ events: events, last_id: lastId });
+    res.json({ session_id: session.id });
   } catch (err) {
-    console.error('POLL ERROR:', err.message);
+    console.error('SESSION ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -43,16 +42,15 @@ app.post('/api/cocktail/event', async (req, res) => {
 });
 
 app.get('/api/cocktail/events', async (req, res) => {
-  const { session_id, after_ts } = req.query;
+  const { session_id, after_id } = req.query;
   try {
     const result = await anthropic.beta.sessions.events.list(session_id, {
       limit: 100,
-      order: 'asc',
-      ...(after_ts ? { 'created_at[gt]': after_ts } : {})
+      ...(after_id ? { after_id: after_id } : {})
     });
     const events = result.data || [];
-    const lastTs = events.length > 0 ? events[events.length - 1].processed_at : (after_ts || null);
-    res.json({ events: events, last_ts: lastTs });
+    const lastId = events.length > 0 ? events[events.length - 1].id : (after_id || null);
+    res.json({ events: events, last_id: lastId });
   } catch (err) {
     console.error('POLL ERROR:', err.message);
     res.status(500).json({ error: err.message });
