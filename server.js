@@ -1,17 +1,17 @@
 const express = require('express');
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  defaultHeaders: {
-    'anthropic-beta': 'managed-agents-2026-04-01'
-  }
-});
 const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  defaultHeaders: {
+    'anthropic-beta': 'managed-agents-2026-04-01'
+  }
+});
+
 const AGENT_ID = process.env.AGENT_ID;
 const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 
