@@ -140,4 +140,206 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 <script>
-const LOGO = 'data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDIuMDMgNjYuNDkiIHJvbGU9ImltZyI+PHRpdGxlPkJvdW50ZW91czwvdGl0bGU+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNGRkZGRkY7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIwOS4xMSw0My40NWE2LjExLDYuMTEsMCwwLDAsNi4xLDYuMTFoLjkzdjE2aC0uNTlsLTEuMzksMGEyMS4zMSwyMS4zMSwwLDAsMS0xMC0yLjQ3LDIwLjI0LDIwLjI0LDAsMCwxLTcuNTYtNi42OUMxOTQuMjEsNTIuODMsMTkzLDQ4LDE5Myw0Mi4xMnYtMzJoMTUuODlsLS4xMSwxMS4xNkgyMTZWMzdoLTdsLjA5LDYuNDRNNzIuODMsMTkuOTRBMjMuMSwyMy4xLDAsMSwxLDQ5LjcyLDQzYTIzLjEzLDIzLjEzLDAsMCwxLDIzLjExLTIzLjFtMCwxNS4zMUE3Ljc5LDcuNzksMCwxLDAsODAuNjEsNDMsNy43OSw3Ljc5LDAsMCwwLDcyLjgzLDM1LjI1Wk0wLDQzVjBIMTUuMTFWMjEuMjloMEEyMy4xLDIzLjEsMCwxLDEsMCw0M20yMy4xLTcuNzlBNy43OSw3Ljc5LDAsMSwwLDMwLjg5LDQzLDcuOCw3LjgsMCwwLDAsMjMuMSwzNS4xOFpNOTkuODksNDUuNmEyMC44OSwyMC44OSwwLDEsMCw0MS43NywwVjIyLjI1SDEyNS44M2wwLDI0LjI3YTUuMDcsNS4wNywwLDEsMS0xMC4xNCwwVjIyLjI1SDk5Ljg4VjQ1LjZNMzE3LjA1LDQzQTIzLjEsMjMuMSwwLDEsMSwyOTQsMTkuOTQsMjMuMTQsMjMuMTQsMCwwLDEsMzE3LjA1LDQzWm0tMTUuMzIsMGE3Ljc4LDcuNzgsMCwxLDAtMi4yOCw1LjVBNy43OSw3Ljc5LDAsMCwwLDMwMS43Myw0M1ptNDUuNzgsMi41NWE1LjA3LDUuMDcsMCwxLDEtMTAuMTMsMFYyMS4zMkgzMjEuNTRWNDQuMjVsMCwuNDJhMjAuODksMjAuODksMCwwLDAsNDEuNzcsMFYyMS4zMkgzNDcuNVY0NS41OU0xNjYuOTIsMjAuMzdBMjAuOTEsMjAuOTEsMCwwLDAsMTQ2LDQxLjI2VjY1aDE1LjgzVjQwLjM0YTUuMDcsNS4wNywwLDAsMSwxMC4xNCwwVjY1aDE1LjgzbDAtMjMuNzVhMjAuOTEsMjAuOTEsMCwwLDAtMjAuODgtMjAuODltMjMxLjk0LDIxLjRjLTIuMDYtMi4xNS01LjItMy42Ni05LjMtNC40OC0xLjQyLS4zMi0yLjU3LS41OC0zLjQ0LS43OWE2LjYsNi42LDAsMCwxLTEuNzctLjYzYy0uNDItL
+<script>
+const LOGO='data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDIuMDMgNjYuNDkiIHJvbGU9ImltZyI+PHRpdGxlPkJvdW50ZW91czwvdGl0bGU+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNGRkZGRkY7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIwOS4xMSw0My40NWE2LjExLDYuMTEsMCwwLDAsNi4xLDYuMTFoLjkzdjE2aC0uNTlsLTEuMzksMGEyMS4zMSwyMS4zMSwwLDAsMS0xMC0yLjQ3LDIwLjI0LDIwLjI0LDAsMCwxLTcuNTYtNi42OUMxOTQuMjEsNTIuODMsMTkzLDQ4LDE5Myw0Mi4xMnYtMzJoMTUuODlsLS4xMSwxMS4xNkgyMTZWMzdoLTdsLjA5LDYuNDRNNzIuODMsMTkuOTRBMjMuMSwyMy4xLDAsMSwxLDQ5LjcyLDQzYTIzLjEzLDIzLjEzLDAsMCwxLDIzLjExLTIzLjFtMCwxNS4zMUE3Ljc5LDcuNzksMCwxLDAsODAuNjEsNDMsNy43OSw3Ljc5LDAsMCwwLDcyLjgzLDM1LjI1Wk0wLDQzVjBIMTUuMTFWMjEuMjloMEEyMy4xLDIzLjEsMCwxLDEsMCw0M20yMy4xLTcuNzlBNy43OSw3Ljc5LDAsMSwwLDMwLjg5LDQzLDcuOCw3LjgsMCwwLDAsMjMuMSwzNS4xOFpNOTkuODksNDUuNmEyMC44OSwyMC44OSwwLDEsMCw0MS43NywwVjIyLjI1SDEyNS44M2wwLDI0LjI3YTUuMDcsNS4wNywwLDEsMS0xMC4xNCwwVjIyLjI1SDk5Ljg4VjQ1LjZNMzE3LjA1LDQzQTIzLjEsMjMuMSwwLDEsMSwyOTQsMTkuOTQsMjMuMTQsMjMuMTQsMCwwLDEsMzE3LjA1LDQzWm0tMTUuMzIsMGE3Ljc4LDcuNzgsMCwxLDAtMi4yOCw1LjVBNy43OSw3Ljc5LDAsMCwwLDMwMS43Myw0M1ptNDUuNzgsMi41NWE1LjA3LDUuMDcsMCwxLDEtMTAuMTMsMFYyMS4zMkgzMjEuNTRWNDQuMjVsMCwuNDJhMjAuODksMjAuODksMCwwLDAsNDEuNzcsMFYyMS4zMkgzNDcuNVY0NS41OU0xNjYuOTIsMjAuMzdBMjAuOTEsMjAuOTEsMCwwLDAsMTQ2LDQxLjI2VjY1aDE1LjgzVjQwLjM0YTUuMDcsNS4wNywwLDAsMSwxMC4xNCwwVjY1aDE1LjgzbDAtMjMuNzVhMjAuOTEsMjAuOTEsMCwwLDAtMjAuODgtMjAuODltMjMxLjk0LDIxLjRjLTIuMDYtMi4xNS01LjItMy42Ni05LjMtNC40OC0xLjQyLS4zMi0yLjU3LS41OC0zLjQ0LS43OWE2LjYsNi42LDAsMCwxLTEuNzctLjYzYy0uNDItLjI1LS41My0uNDMtLjU1LS40OGExLjkzLDEuOTMsMCwwLDEtLjEzLS44MiwxLjY2LDEuNjYsMCwwLDEsLjg3LTEuNDcsNSw1LDAsMCwxLDIuNzgtLjY3LDE2LDE2LDAsMCwxLDcuNDIsMmwuNzEuMzYsNS42MS0xMC44NS0uOC0uMzNhMzUsMzUsMCwwLDAtMTMuNDEtMi42OUEyNi41NCwyNi41NCwwLDAsMCwzNzkuMSwyMmExOC4xMSwxOC4xMSwwLDAsMC02LDMuMDhBMTMuNjEsMTMuNjEsMCwwLDAsMzY5LjIsMzBhMTUuMzEsMTUuMzEsMCwwLDAtMS4zNSw2LjQ5LDEwLjc0LDEwLjc0LDAsMCwwLDIuOSw3LjkxYzEuOSwxLjkxLDUuMDksMy4yOSw5Ljc0LDQuMjMsMS4zLjI2LDIuMzYuNTEsMy4xNS43NGE2LjEyLDYuMTIsMCwwLDEsMS42NC42OSwxLjM3LDEuMzcsMCwwLDEsLjU0LjU4LDIuODgsMi44OCwwLDAsMSwuMTUsMSwxLjgzLDEuODMsMCwwLDEtLjkzLDEuNTcsNC45MSw0LjkxLDAsMCwxLTIuOC43M2MtMy40MywwLTcuMTItMS4zNC0xMS00bC0uNzUtLjUxLTYsMTEuNjQuNjUuMzhhMzIuODIsMzIuODIsMCwwLDAsMTYuNjksNC44LDI4LDI4LDAsMCwwLDguMS0xLjExQTE5Ljc3LDE5Ljc3LDAsMCwwLDM5Ni4zMSw2MmExNC4zNSwxNC4zNSwwLDAsMCw0LjItNS4wOEExNSwxNSwwLDAsMCw0MDIsNTAuMTVhMTEuNjQsMTEuNjQsMCwwLDAtMy4xNy04LjM4TTI2Ni42Myw0OC4zM0gyMzguMTZjLjI3LDMuMzgsMi45Miw1LDYsNWE1LjgzLDUuODMsMCwwLDAsNS40Mi0yLjkxbDE0LjA2LDVhMjIuNTUsMjIuNTUsMCwxLDEsMy03LjA5Wk0yNTAuNDksMzguMjVsMC0uNEMyNTAuMTcsMzUsMjQ3LjYzLDMzLDI0NC4xMiwzM3MtNi4wNiwyLTYuMzQsNC44NGwwLC40WiIvPjwvc3ZnPg==';
+
+document.querySelectorAll('img[id^="logo"]').forEach(function(el){el.src=LOGO;});
+
+const BACKEND_URL='/api/cocktail';
+let sessionId=null,polling=false,globalLastTs=null;
+
+async function beginSession(){
+  var btn=document.getElementById('begin-btn');
+  btn.disabled=true;btn.textContent='Starting…';
+  try{
+    var res=await fetch(BACKEND_URL+'/session',{method:'POST'});
+    if(!res.ok)throw new Error(await res.text());
+    var data=await res.json();
+    sessionId=data.session_id;
+    document.getElementById('start-screen').style.display='none';
+    document.getElementById('chat-screen').style.display='flex';
+    await postEvent({type:'user.message',content:[{type:'text',text:'Hello'}]});
+    pollEvents();
+  }catch(err){
+    btn.disabled=false;btn.textContent='Retry';
+    addMessage('system','Could not connect. Please try again.');
+    console.error(err);
+  }
+}
+
+async function sendMessage(){
+  var input=document.getElementById('user-input');
+  var text=input.value.trim();
+  if(!text||!sessionId)return;
+  input.value='';
+  addMessage('user',text);
+  setSendDisabled(true);
+  disableOptions();
+  await postEvent({type:'user.message',content:[{type:'text',text:text}]});
+  pollEvents();
+}
+
+async function sendOption(number,label){
+  addMessage('user',number+'. '+label);
+  setSendDisabled(true);
+  disableOptions();
+  await postEvent({type:'user.message',content:[{type:'text',text:String(number)}]});
+  pollEvents();
+}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+
+async function postEvent(event){
+  await fetch(BACKEND_URL+'/event',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({session_id:sessionId,event:event})
+  });
+}
+
+async function pollEvents(){
+  if(polling)return;
+  polling=true;
+  showTyping(true);
+  var idle=false,agentText='';
+  while(!idle){
+    await sleep(1000);
+    try{
+      var url=BACKEND_URL+'/events?session_id='+sessionId+(globalLastTs?'&after_ts='+encodeURIComponent(globalLastTs):'');
+      var res=await fetch(url);
+      var data=await res.json();
+      for(var i=0;i<(data.events||[]).length;i++){
+        var ev=data.events[i];
+        if(ev.type==='agent.message'){
+          for(var j=0;j<(ev.content||[]).length;j++){
+            if(ev.content[j].type==='text')agentText+=ev.content[j].text;
+          }
+        }
+        if(ev.type==='agent.custom_tool_use'&&ev.name==='print_order_ticket'){
+          handleTicket(ev.input);
+          await postEvent({
+            type:'user.custom_tool_result',
+            custom_tool_use_id:ev.id,
+            content:[{type:'text',text:'Ticket printed successfully.'}],
+            is_error:false
+          });
+        }
+        if(ev.type==='session.status_idle'){idle=true;}
+      }
+      if(data.last_ts)globalLastTs=data.last_ts;
+    }catch(err){
+      console.error(err);idle=true;
+    }
+  }
+  showTyping(false);
+  if(agentText)renderMessage(agentText);
+  setSendDisabled(false);
+  polling=false;
+}
+
+function cleanText(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g,'$1')
+    .replace(/\*(.*?)\*/g,'$1')
+    .replace(/__(.*?)__/g,'$1')
+    .replace(/_(.*?)_/g,'$1')
+    .replace(/^#{1,6}\s/gm,'')
+    .trim();
+}
+
+function renderMessage(rawText){
+  var text=cleanText(rawText);
+  var lines=text.split('\n');
+  var questionLines=[],optionLines=[];
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    if(/^\d+\.\s/.test(line)){optionLines.push(line);}
+    else{questionLines.push(lines[i]);}
+  }
+  var questionText=questionLines.join('\n').trim();
+  if(questionText)addMessage('agent',questionText);
+  if(optionLines.length>0){
+    var wrap=document.createElement('div');
+    wrap.className='options-wrap';
+    for(var k=0;k<optionLines.length;k++){
+      var match=optionLines[k].match(/^(\d+)\.\s(.+)/);
+      if(match){
+        (function(num,label){
+          var btn=document.createElement('button');
+          btn.className='option-btn';
+          btn.textContent=num+'. '+label;
+          btn.onclick=function(){sendOption(num,label);};
+          wrap.appendChild(btn);
+        })(match[1],match[2]);
+      }
+    }
+    document.getElementById('messages').appendChild(wrap);
+    document.getElementById('messages').scrollTop=9999;
+  }
+}
+
+function disableOptions(){
+  document.querySelectorAll('.option-btn').forEach(function(b){b.disabled=true;});
+}
+
+function handleTicket(input){
+  document.getElementById('ticket-order').textContent=input.customer_order||'-';
+  document.getElementById('ticket-ingredients').textContent=input.ingredients||'-';
+  var sec=document.getElementById('ticket-notes-section');
+  if(input.notes){
+    document.getElementById('ticket-notes').textContent='Note: '+input.notes;
+    sec.style.display='block';
+  }else{
+    sec.style.display='none';
+  }
+  document.getElementById('ticket-overlay').style.display='flex';
+}
+
+function closeTicket(){
+  document.getElementById('ticket-overlay').style.display='none';
+  sessionId=null;
+  polling=false;
+  globalLastTs=null;
+  document.getElementById('messages').innerHTML='';
+  document.getElementById('user-input').value='';
+  setSendDisabled(false);
+var btn=document.getElementById('begin-btn');
+  btn.disabled=false;
+  btn.textContent='Begin';
+  document.getElementById('chat-screen').style.display='none';
+  document.getElementById('start-screen').style.display='block';
+}
+
+function addMessage(role,text){
+  var div=document.createElement('div');
+  div.className='message '+role;
+  div.textContent=text;
+  document.getElementById('messages').appendChild(div);
+  document.getElementById('messages').scrollTop=9999;
+}
+
+function showTyping(show){
+  var t=document.getElementById('typing-indicator');
+  if(show&&!t){
+    t=document.createElement('div');
+    t.id='typing-indicator';
+    t.className='message agent typing';
+    t.innerHTML='<span></span><span></span><span></span>';
+    document.getElementById('messages').appendChild(t);
+    document.getElementById('messages').scrollTop=9999;
+  }else if(!show&&t){
+    t.remove();
+  }
+}
+
+function setSendDisabled(val){
+  document.getElementById('send-btn').disabled=val;
+  document.getElementById('user-input').disabled=val;
+}
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+</script>
+</body>
+</html>
