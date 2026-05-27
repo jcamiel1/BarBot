@@ -1,5 +1,10 @@
 const express = require('express');
-const Anthropic = require('@anthropic-ai/sdk');
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  defaultHeaders: {
+    'anthropic-beta': 'managed-agents-2026-04-01'
+  }
+});
 const path = require('path');
 
 const app = express();
