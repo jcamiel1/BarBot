@@ -77,7 +77,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </head>
 <body>
   <div id="start-screen">
-  <img class="start-logo" id="logo-start" alt="Bounteous"/>
+  <img class="start-logo" id="logo-start" alt="Bounteous" src="/logo.png"/>
   <div class="start-eyebrow">Est. 2024</div>
   <h1>The Bar</h1>
   <p>Let our sommelier find your perfect drink</p>
@@ -86,13 +86,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <div id="chat-screen">
   <div class="chat-sidebar">
-    <img class="sidebar-logo" id="logo-sidebar" alt="Bounteous"/>
+    <img class="sidebar-logo" id="logo-sidebar" alt="Bounteous" src="/logo.png"/>
     <div class="sidebar-line"></div>
     <div class="sidebar-label">Sommelier</div>
   </div>
   <div class="chat-main">
     <div id="chat-header">
-      <img class="chat-header-logo" id="logo-header" alt="Bounteous"/>
+      <img class="chat-header-logo" id="logo-header" alt="Bounteous" src="/logo.png"/>
       <h2>Cocktail Sommelier</h2>
       <span>Personal Selection</span>
     </div>
@@ -122,7 +122,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <div id="ticket-overlay">
   <div id="ticket">
-    <img class="ticket-logo" id="logo-ticket" alt="Bounteous"/>
+    <img class="ticket-logo" id="logo-ticket" alt="Bounteous" src="/logo.png"/>
     <div class="ticket-eyebrow">Order Confirmed</div>
     <h3>Your Cocktail</h3>
     <div class="divider"></div>
@@ -141,9 +141,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 <script>
 <script>
-const LOGO='data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDIuMDMgNjYuNDkiIHJvbGU9ImltZyI+PHRpdGxlPkJvdW50ZW91czwvdGl0bGU+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNGRkZGRkY7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIwOS4xMSw0My40NWE2LjExLDYuMTEsMCwwLDAsNi4xLDYuMTFoLjkzdjE2aC0uNTlsLTEuMzksMGEyMS4zMSwyMS4zMSwwLDAsMS0xMC0yLjQ3LDIwLjI0LDIwLjI0LDAsMCwxLTcuNTYtNi42OUMxOTQuMjEsNTIuODMsMTkzLDQ4LDE5Myw0Mi4xMnYtMzJoMTUuODlsLS4xMSwxMS4xNkgyMTZWMzdoLTdsLjA5LDYuNDRNNzIuODMsMTkuOTRBMjMuMSwyMy4xLDAsMSwxLDQ5LjcyLDQzYTIzLjEzLDIzLjEzLDAsMCwxLDIzLjExLTIzLjFtMCwxNS4zMUE3Ljc5LDcuNzksMCwxLDAsODAuNjEsNDMsNy43OSw3Ljc5LDAsMCwwLDcyLjgzLDM1LjI1Wk0wLDQzVjBIMTUuMTFWMjEuMjloMEEyMy4xLDIzLjEsMCwxLDEsMCw0M20yMy4xLTcuNzlBNy43OSw3Ljc5LDAsMSwwLDMwLjg5LDQzLDcuOCw3LjgsMCwwLDAsMjMuMSwzNS4xOFpNOTkuODksNDUuNmEyMC44OSwyMC44OSwwLDEsMCw0MS43NywwVjIyLjI1SDEyNS44M2wwLDI0LjI3YTUuMDcsNS4wNywwLDEsMS0xMC4xNCwwVjIyLjI1SDk5Ljg4VjQ1LjZNMzE3LjA1LDQzQTIzLjEsMjMuMSwwLDEsMSwyOTQsMTkuOTQsMjMuMTQsMjMuMTQsMCwwLDEsMzE3LjA1LDQzWm0tMTUuMzIsMGE3Ljc4LDcuNzgsMCwxLDAtMi4yOCw1LjVBNy43OSw3Ljc5LDAsMCwwLDMwMS43Myw0M1ptNDUuNzgsMi41NWE1LjA3LDUuMDcsMCwxLDEtMTAuMTMsMFYyMS4zMkgzMjEuNTRWNDQuMjVsMCwuNDJhMjAuODksMjAuODksMCwwLDAsNDEuNzcsMFYyMS4zMkgzNDcuNVY0NS41OU0xNjYuOTIsMjAuMzdBMjAuOTEsMjAuOTEsMCwwLDAsMTQ2LDQxLjI2VjY1aDE1LjgzVjQwLjM0YTUuMDcsNS4wNywwLDAsMSwxMC4xNCwwVjY1aDE1LjgzbDAtMjMuNzVhMjAuOTEsMjAuOTEsMCwwLDAtMjAuODgtMjAuODltMjMxLjk0LDIxLjRjLTIuMDYtMi4xNS01LjItMy42Ni05LjMtNC40OC0xLjQyLS4zMi0yLjU3LS41OC0zLjQ0LS43OWE2LjYsNi42LDAsMCwxLTEuNzctLjYzYy0uNDItLjI1LS41My0uNDMtLjU1LS40OGExLjkzLDEuOTMsMCwwLDEtLjEzLS44MiwxLjY2LDEuNjYsMCwwLDEsLjg3LTEuNDcsNSw1LDAsMCwxLDIuNzgtLjY3LDE2LDE2LDAsMCwxLDcuNDIsMmwuNzEuMzYsNS42MS0xMC44NS0uOC0uMzNhMzUsMzUsMCwwLDAtMTMuNDEtMi42OUEyNi41NCwyNi41NCwwLDAsMCwzNzkuMSwyMmExOC4xMSwxOC4xMSwwLDAsMC02LDMuMDhBMTMuNjEsMTMuNjEsMCwwLDAsMzY5LjIsMzBhMTUuMzEsMTUuMzEsMCwwLDAtMS4zNSw2LjQ5LDEwLjc0LDEwLjc0LDAsMCwwLDIuOSw3LjkxYzEuOSwxLjkxLDUuMDksMy4yOSw5Ljc0LDQuMjMsMS4zLjI2LDIuMzYuNTEsMy4xNS43NGE2LjEyLDYuMTIsMCwwLDEsMS42NC42OSwxLjM3LDEuMzcsMCwwLDEsLjU0LjU4LDIuODgsMi44OCwwLDAsMSwuMTUsMSwxLjgzLDEuODMsMCwwLDEtLjkzLDEuNTcsNC45MSw0LjkxLDAsMCwxLTIuOC43M2MtMy40MywwLTcuMTItMS4zNC0xMS00bC0uNzUtLjUxLTYsMTEuNjQuNjUuMzhhMzIuODIsMzIuODIsMCwwLDAsMTYuNjksNC44LDI4LDI4LDAsMCwwLDguMS0xLjExQTE5Ljc3LDE5Ljc3LDAsMCwwLDM5Ni4zMSw2MmExNC4zNSwxNC4zNSwwLDAsMCw0LjItNS4wOEExNSwxNSwwLDAsMCw0MDIsNTAuMTVhMTEuNjQsMTEuNjQsMCwwLDAtMy4xNy04LjM4TTI2Ni42Myw0OC4zM0gyMzguMTZjLjI3LDMuMzgsMi45Miw1LDYsNWE1LjgzLDUuODMsMCwwLDAsNS40Mi0yLjkxbDE0LjA2LDVhMjIuNTUsMjIuNTUsMCwxLDEsMy03LjA5Wk0yNTAuNDksMzguMjVsMC0uNEMyNTAuMTcsMzUsMjQ3LjYzLDMzLDI0NC4xMiwzM3MtNi4wNiwyLTYuMzQsNC44NGwwLC40WiIvPjwvc3ZnPg==';
-
-document.querySelectorAll('img[id^="logo"]').forEach(function(el){el.src=LOGO;});
 
 const BACKEND_URL='/api/cocktail';
 let sessionId=null,polling=false,globalLastId=null;
