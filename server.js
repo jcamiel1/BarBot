@@ -1,8 +1,3 @@
-app.use((req, res, next) => {
-  console.log(req.method, req.url);
-  next();
-});
-
 const express = require('express');
 const Anthropic = require('@anthropic-ai/sdk');
 const path = require('path');
@@ -10,6 +5,11 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  console.log(req.method, req.url);
+  next();
+});
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
