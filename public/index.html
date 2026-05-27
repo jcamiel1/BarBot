@@ -11,8 +11,8 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #0d0d0d;
-      color: #e8e0d4;
+      background: #07071a;
+      color: #ddd8f0;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -20,14 +20,15 @@
       overflow: hidden;
     }
 
-    /* Subtle background texture */
+    /* Subtle blue/purple ambient glow */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(ellipse at 20% 50%, rgba(180, 140, 80, 0.04) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(180, 140, 80, 0.03) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 50%, rgba(100, 60, 200, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(60, 80, 220, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 90%, rgba(120, 40, 180, 0.05) 0%, transparent 55%);
       pointer-events: none;
     }
 
@@ -36,6 +37,41 @@
       text-align: center;
       padding: 48px;
       animation: fadeIn 1.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .start-logo {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 28px;
+      /* Replace src below with your actual logo URL */
+    }
+
+    .start-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.85);
+    }
+
+    /* Fallback monogram if no logo image */
+    .logo-fallback {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 1px solid rgba(150, 100, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: rgba(180, 140, 255, 0.8);
+      letter-spacing: 0.05em;
+      margin-bottom: 28px;
+      background: rgba(100, 60, 200, 0.08);
     }
 
     .start-eyebrow {
@@ -44,7 +80,7 @@
       font-weight: 500;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: #b4885a;
+      color: #8060cc;
       margin-bottom: 20px;
     }
 
@@ -52,7 +88,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 4.5rem;
       font-weight: 300;
-      color: #f0e6d0;
+      color: #ede8ff;
       letter-spacing: 0.05em;
       line-height: 1.1;
       margin-bottom: 16px;
@@ -61,15 +97,15 @@
     #start-screen p {
       font-size: 0.875rem;
       font-weight: 300;
-      color: #7a7060;
+      color: #3d3560;
       letter-spacing: 0.08em;
       margin-bottom: 52px;
     }
 
     #begin-btn {
       background: transparent;
-      color: #c9a97a;
-      border: 1px solid rgba(180, 140, 80, 0.5);
+      color: #a080e8;
+      border: 1px solid rgba(140, 90, 240, 0.45);
       padding: 14px 52px;
       font-size: 0.75rem;
       font-family: 'Inter', sans-serif;
@@ -87,13 +123,13 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(180, 140, 80, 0.08);
+      background: rgba(120, 70, 220, 0.1);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
 
     #begin-btn:hover::before { opacity: 1; }
-    #begin-btn:hover { border-color: rgba(180, 140, 80, 0.9); color: #e8c98a; }
+    #begin-btn:hover { border-color: rgba(150, 100, 255, 0.85); color: #c8aaff; }
     #begin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     /* ── CHAT SCREEN ── */
@@ -118,22 +154,40 @@
     }
 
     .sidebar-logo {
-      font-size: 1.4rem;
-      opacity: 0.6;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.4);
+    }
+
+    /* Fallback for sidebar if no logo */
+    .sidebar-logo-fallback {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(140, 100, 220, 0.45);
+      letter-spacing: 0.05em;
     }
 
     .sidebar-line {
       width: 1px;
       flex: 1;
       margin: 20px 0;
-      background: linear-gradient(to bottom, transparent, rgba(180,140,80,0.2), transparent);
+      background: linear-gradient(to bottom, transparent, rgba(120, 80, 220, 0.25), transparent);
     }
 
     .sidebar-label {
       font-size: 0.6rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #4a4438;
+      color: #28204a;
       writing-mode: vertical-rl;
       transform: rotate(180deg);
     }
@@ -151,18 +205,37 @@
 
     #chat-header {
       display: flex;
-      align-items: baseline;
-      gap: 12px;
+      align-items: center;
+      gap: 14px;
       padding-bottom: 24px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
       margin-bottom: 28px;
+    }
+
+    .chat-header-logo {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .chat-header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.6);
+    }
+
+    .chat-header-logo-fallback {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: rgba(160, 120, 255, 0.6);
     }
 
     #chat-header h2 {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.6rem;
       font-weight: 300;
-      color: #f0e6d0;
+      color: #ede8ff;
       letter-spacing: 0.05em;
     }
 
@@ -170,7 +243,8 @@
       font-size: 0.65rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #4a4438;
+      color: #2e265a;
+      margin-left: auto;
     }
 
     #messages {
@@ -181,12 +255,12 @@
       gap: 20px;
       padding-right: 8px;
       scrollbar-width: thin;
-      scrollbar-color: rgba(180,140,80,0.15) transparent;
+      scrollbar-color: rgba(120, 80, 220, 0.15) transparent;
     }
 
     #messages::-webkit-scrollbar { width: 3px; }
     #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
+    #messages::-webkit-scrollbar-thumb { background: rgba(120, 80, 220, 0.2); border-radius: 2px; }
 
     .message {
       max-width: 78%;
@@ -198,26 +272,27 @@
 
     .message.agent {
       align-self: flex-start;
-      color: #d4c8b4;
+      color: #ccc4e8;
       padding: 16px 20px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(100, 70, 200, 0.06);
+      border: 1px solid rgba(120, 80, 220, 0.12);
       border-radius: 2px 16px 16px 16px;
       white-space: pre-wrap;
     }
 
     .message.user {
       align-self: flex-end;
-      color: #0d0d0d;
-      background: #c9a97a;
+      color: #ede8ff;
+      background: linear-gradient(135deg, #3d20a0, #5a30c8);
       padding: 12px 20px;
       border-radius: 16px 16px 2px 16px;
       font-weight: 400;
+      box-shadow: 0 4px 20px rgba(80, 40, 200, 0.3);
     }
 
     .message.system {
       align-self: center;
-      color: #3a3428;
+      color: #28204a;
       font-size: 0.75rem;
       letter-spacing: 0.08em;
     }
@@ -235,8 +310,8 @@
 
     .option-btn {
       background: transparent;
-      border: 1px solid rgba(180, 140, 80, 0.35);
-      color: #b4885a;
+      border: 1px solid rgba(120, 80, 220, 0.35);
+      color: #8060cc;
       padding: 9px 20px;
       border-radius: 100px;
       font-family: 'Inter', sans-serif;
@@ -249,9 +324,9 @@
     }
 
     .option-btn:hover {
-      background: rgba(180, 140, 80, 0.1);
-      border-color: rgba(180, 140, 80, 0.8);
-      color: #e8c98a;
+      background: rgba(100, 60, 200, 0.12);
+      border-color: rgba(150, 100, 255, 0.75);
+      color: #c8aaff;
     }
 
     .option-btn:disabled {
@@ -271,7 +346,7 @@
     .typing span {
       width: 5px;
       height: 5px;
-      background: #b4885a;
+      background: #8060cc;
       border-radius: 50%;
       animation: pulse 1.2s infinite;
       opacity: 0.6;
@@ -297,9 +372,9 @@
 
     #user-input {
       flex: 1;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      color: #e8e0d4;
+      background: rgba(100, 70, 200, 0.05);
+      border: 1px solid rgba(120, 80, 220, 0.1);
+      color: #ddd8f0;
       padding: 12px 18px;
       border-radius: 100px;
       font-size: 0.875rem;
@@ -311,13 +386,13 @@
       line-height: 1.5;
     }
 
-    #user-input::placeholder { color: #3a3428; }
-    #user-input:focus { border-color: rgba(180, 140, 80, 0.3); }
+    #user-input::placeholder { color: #28204a; }
+    #user-input:focus { border-color: rgba(120, 80, 220, 0.35); }
 
     #send-btn {
-      background: rgba(180, 140, 80, 0.15);
-      color: #c9a97a;
-      border: 1px solid rgba(180, 140, 80, 0.3);
+      background: rgba(100, 60, 200, 0.18);
+      color: #a080e8;
+      border: 1px solid rgba(120, 80, 220, 0.3);
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -331,8 +406,8 @@
     }
 
     #send-btn:hover {
-      background: rgba(180, 140, 80, 0.25);
-      border-color: rgba(180, 140, 80, 0.7);
+      background: rgba(100, 60, 200, 0.32);
+      border-color: rgba(150, 100, 255, 0.65);
     }
 
     #send-btn:disabled { opacity: 0.25; cursor: not-allowed; }
@@ -358,7 +433,7 @@
       font-size: 0.6rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #2e2820;
+      color: #1e1840;
       margin-bottom: 8px;
     }
 
@@ -366,418 +441,9 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem;
       font-weight: 300;
-      color: #3d3428;
+      color: #2a2050;
     }
 
     .panel-divider {
       width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, transparent, rgba(180,140,80,0.1), transparent);
-    }
-
-    /* ── TICKET OVERLAY ── */
-    #ticket-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      animation: fadeIn 0.3s ease;
-    }
-
-    #ticket {
-      background: #faf8f4;
-      color: #1a1510;
-      font-family: 'Inter', sans-serif;
-      padding: 48px 40px 36px;
-      border-radius: 4px;
-      width: 360px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-    }
-
-    /* Ticket tear edge */
-    #ticket::before {
-      content: '';
-      position: absolute;
-      top: -1px;
-      left: 0;
-      right: 0;
-      height: 8px;
-      background: repeating-linear-gradient(
-        90deg,
-        #faf8f4 0px, #faf8f4 12px,
-        transparent 12px, transparent 16px
-      );
-    }
-
-    #ticket .ticket-eyebrow {
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #b4885a;
-      margin-bottom: 6px;
-    }
-
-    #ticket h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 300;
-      color: #1a1510;
-      margin-bottom: 28px;
-      letter-spacing: 0.05em;
-    }
-
-    #ticket .divider {
-      border: none;
-      border-top: 1px dashed #d4c8b4;
-      margin: 20px 0;
-    }
-
-    #ticket .t-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #8a7a60;
-      margin-bottom: 6px;
-    }
-
-    #ticket .t-value {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #1a1510;
-      margin-bottom: 16px;
-      line-height: 1.4;
-    }
-
-    #ticket .t-notes {
-      font-size: 0.8rem;
-      color: #6a5a40;
-      font-style: italic;
-    }
-
-    #ticket .ticket-footer {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #b4a890;
-      margin-top: 8px;
-    }
-
-    #close-ticket {
-      margin-top: 28px;
-      background: transparent;
-      color: #1a1510;
-      border: 1px solid rgba(26,21,16,0.25);
-      padding: 11px 40px;
-      font-size: 0.7rem;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    #close-ticket:hover {
-      background: rgba(26,21,16,0.06);
-      border-color: rgba(26,21,16,0.5);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-
-<div id="start-screen">
-  <div class="start-eyebrow">Est. 2024</div>
-  <h1>The Bar</h1>
-  <p>Let our sommelier find your perfect drink</p>
-  <button id="begin-btn" onclick="beginSession()">Begin</button>
-</div>
-
-<div id="chat-screen">
-  <div class="chat-sidebar">
-    <div class="sidebar-logo">🍹</div>
-    <div class="sidebar-line"></div>
-    <div class="sidebar-label">Sommelier</div>
-  </div>
-
-  <div class="chat-main">
-    <div id="chat-header">
-      <h2>Cocktail Sommelier</h2>
-      <span>Personal Selection</span>
-    </div>
-    <div id="messages"></div>
-    <div id="input-area">
-      <textarea id="user-input" rows="1" placeholder="Or type a note…" onkeydown="handleKey(event)"></textarea>
-      <button id="send-btn" onclick="sendMessage()">↑</button>
-    </div>
-  </div>
-
-  <div class="chat-panel">
-    <div class="panel-item">
-      <div class="pi-label">Spirits</div>
-      <div class="pi-value">6 Available</div>
-    </div>
-    <div class="panel-divider"></div>
-    <div class="panel-item">
-      <div class="pi-label">Style</div>
-      <div class="pi-value">Bespoke</div>
-    </div>
-    <div class="panel-divider"></div>
-    <div class="panel-item">
-      <div class="pi-label">Service</div>
-      <div class="pi-value">À la carte</div>
-    </div>
-  </div>
-</div>
-
-<div id="ticket-overlay">
-  <div id="ticket">
-    <div class="ticket-eyebrow">Order Confirmed</div>
-    <h3>Your Cocktail</h3>
-    <div class="divider"></div>
-    <div class="t-label">Cocktail</div>
-    <div class="t-value" id="ticket-order"></div>
-    <div class="t-label">Ingredients</div>
-    <div class="t-value" id="ticket-ingredients"></div>
-    <div id="ticket-notes-section" style="display:none;">
-      <div class="divider"></div>
-      <div class="t-notes" id="ticket-notes"></div>
-    </div>
-    <div class="divider"></div>
-    <div class="ticket-footer">Thank you — enjoy your drink</div>
-    <button id="close-ticket" onclick="closeTicket()">Close</button>
-  </div>
-</div>
-
-<script>
-  const BACKEND_URL = '/api/cocktail';
-  let sessionId = null;
-  let polling = false;
-  let globalLastTs = null;
-
-  async function beginSession() {
-    const btn = document.getElementById('begin-btn');
-    btn.disabled = true;
-    btn.textContent = 'Starting…';
-    try {
-      const res = await fetch(BACKEND_URL + '/session', { method: 'POST' });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      sessionId = data.session_id;
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'flex';
-      await postEvent({ type: 'user.message', content: [{ type: 'text', text: 'Hello' }] });
-      pollEvents();
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Retry';
-      addMessage('system', 'Could not connect. Please try again.');
-      console.error(err);
-    }
-  }
-
-  async function sendMessage() {
-    const input = document.getElementById('user-input');
-    const text = input.value.trim();
-    if (!text || !sessionId) return;
-    input.value = '';
-    addMessage('user', text);
-    setSendDisabled(true);
-    disableOptions();
-    await postEvent({ type: 'user.message', content: [{ type: 'text', text: text }] });
-    pollEvents();
-  }
-
-  async function sendOption(number, label) {
-    addMessage('user', number + '. ' + label);
-    setSendDisabled(true);
-    disableOptions();
-    await postEvent({ type: 'user.message', content: [{ type: 'text', text: String(number) }] });
-    pollEvents();
-  }
-
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  }
-
-  async function postEvent(event) {
-    await fetch(BACKEND_URL + '/event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId, event: event })
-    });
-  }
-
-  async function pollEvents() {
-    if (polling) return;
-    polling = true;
-    showTyping(true);
-    let idle = false;
-    let agentText = '';
-
-    while (!idle) {
-      await sleep(1000);
-      try {
-        const url = BACKEND_URL + '/events?session_id=' + sessionId + (globalLastTs ? '&after_ts=' + encodeURIComponent(globalLastTs) : '');
-        const res = await fetch(url);
-        const data = await res.json();
-        for (var i = 0; i < (data.events || []).length; i++) {
-          var ev = data.events[i];
-          if (ev.type === 'agent.message') {
-            for (var j = 0; j < (ev.content || []).length; j++) {
-              if (ev.content[j].type === 'text') agentText += ev.content[j].text;
-            }
-          }
-          if (ev.type === 'agent.custom_tool_use' && ev.name === 'print_order_ticket') {
-            handleTicket(ev.input);
-            await postEvent({
-              type: 'user.custom_tool_result',
-              custom_tool_use_id: ev.id,
-              content: [{ type: 'text', text: 'Ticket printed successfully.' }],
-              is_error: false
-            });
-          }
-          if (ev.type === 'session.status_idle') { idle = true; }
-        }
-        if (data.last_ts) globalLastTs = data.last_ts;
-      } catch (err) {
-        console.error(err);
-        idle = true;
-      }
-    }
-
-    showTyping(false);
-    if (agentText) renderMessage(agentText);
-    setSendDisabled(false);
-    polling = false;
-  }
-
-  function cleanText(text) {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/__(.*?)__/g, '$1')
-      .replace(/_(.*?)_/g, '$1')
-      .replace(/^#{1,6}\s/gm, '')
-      .trim();
-  }
-
-  function renderMessage(rawText) {
-    var text = cleanText(rawText);
-    var lines = text.split('\n');
-    var questionLines = [];
-    var optionLines = [];
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (/^\d+\.\s/.test(line)) {
-        optionLines.push(line);
-      } else {
-        questionLines.push(lines[i]);
-      }
-    }
-
-    var questionText = questionLines.join('\n').trim();
-    if (questionText) addMessage('agent', questionText);
-
-    if (optionLines.length > 0) {
-      var wrap = document.createElement('div');
-      wrap.className = 'options-wrap';
-      for (var k = 0; k < optionLines.length; k++) {
-        var match = optionLines[k].match(/^(\d+)\.\s(.+)/);
-        if (match) {
-          (function(num, label) {
-            var btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = num + '. ' + label;
-            btn.onclick = function() { sendOption(num, label); };
-            wrap.appendChild(btn);
-          })(match[1], match[2]);
-        }
-      }
-      document.getElementById('messages').appendChild(wrap);
-      document.getElementById('messages').scrollTop = 9999;
-    }
-  }
-
-  function disableOptions() {
-    var btns = document.querySelectorAll('.option-btn');
-    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
-  }
-
-  function handleTicket(input) {
-    document.getElementById('ticket-order').textContent = input.customer_order || '-';
-    document.getElementById('ticket-ingredients').textContent = input.ingredients || '-';
-    var notesSec = document.getElementById('ticket-notes-section');
-    if (input.notes) {
-      document.getElementById('ticket-notes').textContent = 'Note: ' + input.notes;
-      notesSec.style.display = 'block';
-    } else {
-      notesSec.style.display = 'none';
-    }
-    document.getElementById('ticket-overlay').style.display = 'flex';
-  }
-
-  function closeTicket() {
-    document.getElementById('ticket-overlay').style.display = 'none';
-    sessionId = null;
-    polling = false;
-    globalLastTs = null;
-    document.getElementById('messages').innerHTML = '';
-    document.getElementById('user-input').value = '';
-    setSendDisabled(false);
-    var btn = document.getElementById('begin-btn');
-    btn.disabled = false;
-    btn.textContent = 'Begin';
-    document.getElementById('chat-screen').style.display = 'none';
-    document.getElementById('start-screen').style.display = 'block';
-  }
-
-  function addMessage(role, text) {
-    var div = document.createElement('div');
-    div.className = 'message ' + role;
-    div.textContent = text;
-    document.getElementById('messages').appendChild(div);
-    document.getElementById('messages').scrollTop = 9999;
-  }
-
-  function showTyping(show) {
-    var t = document.getElementById('typing-indicator');
-    if (show && !t) {
-      t = document.createElement('div');
-      t.id = 'typing-indicator';
-      t.className = 'message agent typing';
-      t.innerHTML = '<span></span><span></span><span></span>';
-      document.getElementById('messages').appendChild(t);
-      document.getElementById('messages').scrollTop = 9999;
-    } else if (!show && t) {
-      t.remove();
-    }
-  }
-
-  function setSendDisabled(val) {
-    document.getElementById('send-btn').disabled = val;
-    document.getElementById('user-input').disabled = val;
-  }
-
-  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
-</script>
-</body>
-</html>
+      height:
