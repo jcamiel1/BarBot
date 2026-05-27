@@ -43,6 +43,7 @@ app.post('/api/cocktail/event', async (req, res) => {
 
 app.get('/api/cocktail/events', async (req, res) => {
   const { session_id, after_id } = req.query;
+  console.log('POLL called, session_id:', session_id, 'after_id:', after_id);
   try {
     const result = await anthropic.beta.sessions.events.list(session_id, {
       limit: 100,
@@ -50,9 +51,10 @@ app.get('/api/cocktail/events', async (req, res) => {
     });
     const events = result.data || [];
     const lastId = events.length > 0 ? events[events.length - 1].id : (after_id || null);
+    console.log('POLL success, events:', events.length);
     res.json({ events: events, last_id: lastId });
   } catch (err) {
-    console.error('POLL ERROR:', err.message);
+    console.error('POLL ERROR full:', err);
     res.status(500).json({ error: err.message });
   }
 });
