@@ -146,7 +146,7 @@ const LOGO='data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYX
 document.querySelectorAll('img[id^="logo"]').forEach(function(el){el.src=LOGO;});
 
 const BACKEND_URL='/api/cocktail';
-let sessionId=null,polling=false,globalLastTs=null;
+let sessionId=null,polling=false,globalLastId=null;
 
 async function beginSession(){
   var btn=document.getElementById('begin-btn');
@@ -207,7 +207,7 @@ async function pollEvents(){
   while(!idle){
     await sleep(1000);
     try{
-      var url=BACKEND_URL+'/events?session_id='+sessionId+(globalLastTs?'&after_ts='+encodeURIComponent(globalLastTs):'');
+      var url=BACKEND_URL+'/events?session_id='+sessionId+(globalLastId?'&after_id='+encodeURIComponent(globalLastId):'');
       var res=await fetch(url);
       var data=await res.json();
       for(var i=0;i<(data.events||[]).length;i++){
@@ -228,7 +228,7 @@ async function pollEvents(){
         }
         if(ev.type==='session.status_idle'){idle=true;}
       }
-      if(data.last_ts)globalLastTs=data.last_ts;
+      if(data.last_id)globalLastId=data.last_id;
     }catch(err){
       console.error(err);idle=true;
     }
@@ -301,7 +301,7 @@ function closeTicket(){
   document.getElementById('ticket-overlay').style.display='none';
   sessionId=null;
   polling=false;
-  globalLastTs=null;
+  globalLastId=null;
   document.getElementById('messages').innerHTML='';
   document.getElementById('user-input').value='';
   setSendDisabled(false);
