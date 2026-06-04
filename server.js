@@ -21,6 +21,8 @@ const anthropic = new Anthropic({
 const AGENT_ID = process.env.AGENT_ID;
 const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 
+console.log('AGENT_ID:', AGENT_ID); 
+
 app.post('/api/cocktail/session', async (req, res) => {
   try {
     const session = await anthropic.beta.sessions.create({
