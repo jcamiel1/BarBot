@@ -245,34 +245,100 @@ function cleanText(text){
     .trim();
 }
 
-function renderMessage(rawText){
-  var text=cleanText(rawText);
-  var lines=text.split('\n');
-  var questionLines=[],optionLines=[];
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].trim();
-    if(/^\d+\.\s/.test(line)){optionLines.push(line);}
-    else{questionLines.push(lines[i]);}
+function renderMessage(rawText) {
+  var text = cleanText(rawText);
+
+  // Extract all [bracket] tokens from the text
+  var bracketOptions = [];
+  var bracketRegex = /\[([^\]]+)\]/g;
+  var match;
+  while ((match = bracketRegex.exec(text)) !== null) {
+    bracketOptions.push(match[1]);
   }
-  var questionText=questionLines.join('\n').trim();
-  if(questionText)addMessage('agent',questionText);
-  if(optionLines.length>0){
-    var wrap=document.createElement('div');
-    wrap.className='options-wrap';
-    for(var k=0;k<optionLines.length;k++){
-      var match=optionLines[k].match(/^(\d+)\.\s(.+)/);
-      if(match){
-        (function(num,label){
-          var btn=document.createElement('button');
-          btn.className='option-btn';
-          btn.textContent=num+'. '+label;
-          btn.onclick=function(){sendOption(num,label);};
-          wrap.appendChild(btn);
-        })(match[1],match[2]);
+
+  // Remove bracket tokens from the text for clean display
+  var cleanedText = bracketOptions.length > 0
+    ? text.replace(/\[([^\]]+)\]/g, '').replace(/\s+/g, ' ').trim()
+    : text;
+
+  // Also check for numbered options (existing logic)
+  var lines = cleanedText.split('\n');
+  var questionLines = [], optionLines = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (/^\d+\.\s/.test(line)) { optionLines.push(line); }
+    else { questionLines.push(lines[i]); }
+  }
+
+  var questionText = questionLines.join('\n').trim();
+  if (questionText) addMessage('agent', questionText);
+
+  // Render bracket-style buttons (multi-select)
+  if (bracketOptions.length > 0) {
+    var wrap = document.createElement('div');
+    wrap.className = 'options-wrap';
+    wrap.dataset.multiselect = 'true';
+    var selected = [];
+    bracketOptions.forEach(function(label) {
+      var btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = label;
+      btn.onclick = function() {
+        if (btn.dataset.selected === 'true') {
+          btn.dataset.selected = 'false';
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+          selected = selected.filter(function(s) { return s !== label; });
+        } else {
+          btn.dataset.selected = 'true';
+          btn.style.background = 'rgba(100,60,200,0.28)';
+          btn.style.borderColor = 'rgba(150,100,255,0.85)';
+          btn.style.color = '#c8aaff';
+          selected.push(label);
+        }
+      };
+      wrap.appendChild(btn);
+    });
+
+    // Confirm button to submit selections
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'option-btn';
+    confirmBtn.textContent = '✓ Done';
+    confirmBtn.style.marginTop = '8px';
+    confirmBtn.onclick = function() {
+      if (selected.length === 0) return;
+      var text = selected.join(', ');
+      addMessage('user', text);
+      setSendDisabled(true);
+      disableOptions();
+      postEvent({ type: 'user.message', content: [{ type: 'text', text: text }] });
+      pollEvents();
+    };
+    wrap.appendChild(confirmBtn);
+
+    document.getElementById('messages').appendChild(wrap);
+    document.getElementById('messages').scrollTop = 9999;
+  }
+
+  // Render numbered buttons (existing logic)
+  if (optionLines.length > 0) {
+    var wrap2 = document.createElement('div');
+    wrap2.className = 'options-wrap';
+    for (var k = 0; k < optionLines.length; k++) {
+      var m = optionLines[k].match(/^(\d+)\.\s(.+)/);
+      if (m) {
+        (function(num, lbl) {
+          var btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = num + '. ' + lbl;
+          btn.onclick = function() { sendOption(num, lbl); };
+          wrap2.appendChild(btn);
+        })(m[1], m[2]);
       }
     }
-    document.getElementById('messages').appendChild(wrap);
-    document.getElementById('messages').scrollTop=9999;
+    document.getElementById('messages').appendChild(wrap2);
+    document.getElementById('messages').scrollTop = 9999;
   }
 }
 
