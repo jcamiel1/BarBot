@@ -256,15 +256,10 @@ function renderMessage(rawText) {
 
   // Detect slider pattern
   if (/Safe\s*◀[—\-]+▶\s*Adventurous/i.test(text) || /Safe\s*[◀<][^\n]*[▶>]\s*Adventurous/i.test(text)) {
-    // Extract the question text (everything before the slider line)
-    var sliderLineIndex = -1;
     var lines = text.split('\n');
     var questionParts = [];
     for (var i = 0; i < lines.length; i++) {
-      if (/Safe/i.test(lines[i]) && /Adventurous/i.test(lines[i])) {
-        sliderLineIndex = i;
-        break;
-      }
+      if (/Safe/i.test(lines[i]) && /Adventurous/i.test(lines[i])) break;
       questionParts.push(lines[i]);
     }
     var questionText = questionParts.join('\n').trim();
@@ -297,22 +292,20 @@ function renderMessage(rawText) {
       valueDisplay.textContent = sliderLabels[parseInt(slider.value)];
     };
 
-  if (bracketOptions.length > 1) {
-  var confirmBtn = document.createElement('button');
-  confirmBtn.className = 'option-btn';
-  confirmBtn.textContent = '✓ Done';
-  confirmBtn.style.marginTop = '8px';
-  confirmBtn.onclick = function() {
-    if (selected.length === 0) return;
-    var txt = selected.join(', ');
-    addMessage('user', txt);
-    setSendDisabled(true);
-    disableOptions();
-    postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
-    pollEvents();
-  };
-  wrap.appendChild(confirmBtn);
-}
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'option-btn';
+    confirmBtn.textContent = '✓ Done';
+    confirmBtn.style.alignSelf = 'center';
+    confirmBtn.onclick = function() {
+      var label = sliderLabels[parseInt(slider.value)];
+      addMessage('user', label);
+      setSendDisabled(true);
+      disableOptions();
+      postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
+      pollEvents();
+    };
+
+    wrap.appendChild(valueDisplay);
     wrap.appendChild(slider);
     wrap.appendChild(labelRow);
     wrap.appendChild(confirmBtn);
@@ -344,51 +337,69 @@ function renderMessage(rawText) {
   var questionText = questionLines.join('\n').trim();
   if (questionText) addMessage('agent', questionText);
 
+  // Render bracket-style buttons
   if (bracketOptions.length > 0) {
     var wrap = document.createElement('div');
     wrap.className = 'options-wrap';
-    wrap.dataset.multiselect = 'true';
     var selected = [];
+
     bracketOptions.forEach(function(label) {
       var btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.textContent = label;
-      btn.onclick = function() {
-        if (btn.dataset.selected === 'true') {
-          btn.dataset.selected = 'false';
-          btn.style.background = '';
-          btn.style.borderColor = '';
-          btn.style.color = '';
-          selected = selected.filter(function(s) { return s !== label; });
-        } else {
-          btn.dataset.selected = 'true';
-          btn.style.background = 'rgba(100,60,200,0.28)';
-          btn.style.borderColor = 'rgba(150,100,255,0.85)';
-          btn.style.color = '#c8aaff';
-          selected.push(label);
-        }
-      };
+
+      // Single bracket option = auto-submit on tap (no Done button)
+      if (bracketOptions.length === 1) {
+        btn.onclick = function() {
+          addMessage('user', label);
+          setSendDisabled(true);
+          disableOptions();
+          postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
+          pollEvents();
+        };
+      } else {
+        btn.onclick = function() {
+          if (btn.dataset.selected === 'true') {
+            btn.dataset.selected = 'false';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            selected = selected.filter(function(s) { return s !== label; });
+          } else {
+            btn.dataset.selected = 'true';
+            btn.style.background = 'rgba(100,60,200,0.28)';
+            btn.style.borderColor = 'rgba(150,100,255,0.85)';
+            btn.style.color = '#c8aaff';
+            selected.push(label);
+          }
+        };
+      }
       wrap.appendChild(btn);
     });
 
-    var confirmBtn = document.createElement('button');
-    confirmBtn.className = 'option-btn';
-    confirmBtn.textContent = '✓ Done';
-    confirmBtn.style.marginTop = '8px';
-    confirmBtn.onclick = function() {
-      if (selected.length === 0) return;
-      var txt = selected.join(', ');
-      addMessage('user', txt);
-      setSendDisabled(true);
-      disableOptions();
-      postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
-      pollEvents();
-    };
-    wrap.appendChild(confirmBtn);
+    // Only show Done button for multi-select groups
+    if (bracketOptions.length > 1) {
+      var confirmBtn = document.createElement('button');
+      confirmBtn.className = 'option-btn';
+      confirmBtn.textContent = '✓ Done';
+      confirmBtn.style.marginTop = '8px';
+      confirmBtn.onclick = function() {
+        if (selected.length === 0) return;
+        var txt = selected.join(', ');
+        addMessage('user', txt);
+        setSendDisabled(true);
+        disableOptions();
+        postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
+        pollEvents();
+      };
+      wrap.appendChild(confirmBtn);
+    }
+
     document.getElementById('messages').appendChild(wrap);
     document.getElementById('messages').scrollTop = 9999;
   }
 
+  // Render numbered buttons (existing logic)
   if (optionLines.length > 0) {
     var wrap2 = document.createElement('div');
     wrap2.className = 'options-wrap';
