@@ -409,7 +409,7 @@ function renderMessage(rawText) {
         (function(num, lbl) {
           var btn = document.createElement('button');
           btn.className = 'option-btn';
-          btn.textContent = num + '. ' + lbl;
+          btn.textContent = lbl;
           btn.onclick = function() { sendOption(num, lbl); };
           wrap2.appendChild(btn);
         })(m[1], m[2]);
