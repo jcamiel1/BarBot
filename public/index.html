@@ -297,20 +297,22 @@ function renderMessage(rawText) {
       valueDisplay.textContent = sliderLabels[parseInt(slider.value)];
     };
 
-    var confirmBtn = document.createElement('button');
-    confirmBtn.className = 'option-btn';
-    confirmBtn.textContent = '✓ Done';
-    confirmBtn.style.alignSelf = 'center';
-    confirmBtn.onclick = function() {
-      var label = sliderLabels[parseInt(slider.value)];
-      addMessage('user', label);
-      setSendDisabled(true);
-      disableOptions();
-      postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
-      pollEvents();
-    };
-
-    wrap.appendChild(valueDisplay);
+  if (bracketOptions.length > 1) {
+  var confirmBtn = document.createElement('button');
+  confirmBtn.className = 'option-btn';
+  confirmBtn.textContent = '✓ Done';
+  confirmBtn.style.marginTop = '8px';
+  confirmBtn.onclick = function() {
+    if (selected.length === 0) return;
+    var txt = selected.join(', ');
+    addMessage('user', txt);
+    setSendDisabled(true);
+    disableOptions();
+    postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
+    pollEvents();
+  };
+  wrap.appendChild(confirmBtn);
+}
     wrap.appendChild(slider);
     wrap.appendChild(labelRow);
     wrap.appendChild(confirmBtn);
