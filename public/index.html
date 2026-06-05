@@ -248,6 +248,71 @@ function cleanText(text){
 function renderMessage(rawText) {
   var text = cleanText(rawText);
 
+  // Detect slider pattern
+  if (/Safe\s*◀[—\-]+▶\s*Adventurous/i.test(text) || /Safe\s*[◀<][^\n]*[▶>]\s*Adventurous/i.test(text)) {
+    // Extract the question text (everything before the slider line)
+    var sliderLineIndex = -1;
+    var lines = text.split('\n');
+    var questionParts = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (/Safe/i.test(lines[i]) && /Adventurous/i.test(lines[i])) {
+        sliderLineIndex = i;
+        break;
+      }
+      questionParts.push(lines[i]);
+    }
+    var questionText = questionParts.join('\n').trim();
+    if (questionText) addMessage('agent', questionText);
+
+    var sliderLabels = ['Safe', 'Cautious', 'Balanced', 'Daring', 'Adventurous'];
+
+    var wrap = document.createElement('div');
+    wrap.className = 'slider-wrap';
+
+    var valueDisplay = document.createElement('div');
+    valueDisplay.className = 'slider-value';
+    valueDisplay.textContent = 'Balanced';
+
+    var labelRow = document.createElement('div');
+    labelRow.className = 'slider-labels';
+    var leftLabel = document.createElement('span');
+    leftLabel.textContent = 'Safe';
+    var rightLabel = document.createElement('span');
+    rightLabel.textContent = 'Adventurous';
+    labelRow.appendChild(leftLabel);
+    labelRow.appendChild(rightLabel);
+
+    var slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '4';
+    slider.value = '2';
+    slider.oninput = function() {
+      valueDisplay.textContent = sliderLabels[parseInt(slider.value)];
+    };
+
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'option-btn';
+    confirmBtn.textContent = '✓ Done';
+    confirmBtn.style.alignSelf = 'center';
+    confirmBtn.onclick = function() {
+      var label = sliderLabels[parseInt(slider.value)];
+      addMessage('user', label);
+      setSendDisabled(true);
+      disableOptions();
+      postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
+      pollEvents();
+    };
+
+    wrap.appendChild(valueDisplay);
+    wrap.appendChild(slider);
+    wrap.appendChild(labelRow);
+    wrap.appendChild(confirmBtn);
+    document.getElementById('messages').appendChild(wrap);
+    document.getElementById('messages').scrollTop = 9999;
+    return;
+  }
+
   // Extract all [bracket] tokens from the text
   var bracketOptions = [];
   var bracketRegex = /\[([^\]]+)\]/g;
@@ -256,12 +321,10 @@ function renderMessage(rawText) {
     bracketOptions.push(match[1]);
   }
 
-  // Remove bracket tokens from the text for clean display
   var cleanedText = bracketOptions.length > 0
     ? text.replace(/\[([^\]]+)\]/g, '').replace(/\s+/g, ' ').trim()
     : text;
 
-  // Also check for numbered options (existing logic)
   var lines = cleanedText.split('\n');
   var questionLines = [], optionLines = [];
   for (var i = 0; i < lines.length; i++) {
@@ -273,7 +336,6 @@ function renderMessage(rawText) {
   var questionText = questionLines.join('\n').trim();
   if (questionText) addMessage('agent', questionText);
 
-  // Render bracket-style buttons (multi-select)
   if (bracketOptions.length > 0) {
     var wrap = document.createElement('div');
     wrap.className = 'options-wrap';
@@ -301,27 +363,24 @@ function renderMessage(rawText) {
       wrap.appendChild(btn);
     });
 
-    // Confirm button to submit selections
     var confirmBtn = document.createElement('button');
     confirmBtn.className = 'option-btn';
     confirmBtn.textContent = '✓ Done';
     confirmBtn.style.marginTop = '8px';
     confirmBtn.onclick = function() {
       if (selected.length === 0) return;
-      var text = selected.join(', ');
-      addMessage('user', text);
+      var txt = selected.join(', ');
+      addMessage('user', txt);
       setSendDisabled(true);
       disableOptions();
-      postEvent({ type: 'user.message', content: [{ type: 'text', text: text }] });
+      postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
       pollEvents();
     };
     wrap.appendChild(confirmBtn);
-
     document.getElementById('messages').appendChild(wrap);
     document.getElementById('messages').scrollTop = 9999;
   }
 
-  // Render numbered buttons (existing logic)
   if (optionLines.length > 0) {
     var wrap2 = document.createElement('div');
     wrap2.className = 'options-wrap';
