@@ -73,6 +73,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 #close-ticket:hover{background:rgba(100,60,200,.12);border-color:rgba(150,100,255,.6)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slider-wrap{align-self:flex-start;display:flex;flex-direction:column;gap:14px;max-width:90%;animation:slideUp .3s ease;padding:16px 20px;background:rgba(100,70,200,.06);border:1px solid rgba(120,80,220,.12);border-radius:2px 16px 16px 16px;}
+.slider-labels{display:flex;justify-content:space-between;font-size:.75rem;color:#8060cc;letter-spacing:.08em}
+.slider-value{text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#ede8ff;letter-spacing:.05em;min-height:1.4em}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:linear-gradient(90deg,rgba(120,80,220,.3),rgba(150,100,255,.7));border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#3d20a0,#5a30c8);border:2px solid rgba(150,100,255,.8);cursor:pointer;box-shadow:0 2px 8px rgba(80,40,200,.4)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#3d20a0,#5a30c8);border:2px solid rgba(150,100,255,.8);cursor:pointer;box-shadow:0 2px 8px rgba(80,40,200,.4)}
 </style>
 </head>
 <body>
