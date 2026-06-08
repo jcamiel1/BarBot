@@ -412,52 +412,63 @@ function renderMessage(rawText) {
       };
       wrap.appendChild(confirmBtn);
 
-    } else {
-      // Pure multi-select (flavor buttons)
-      bracketOptions.forEach(function(label) {
-        var btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = label;
-        btn.onclick = function() {
-          if (btn.dataset.selected === 'true') {
-            btn.dataset.selected = 'false';
-            btn.style.background = '';
-            btn.style.borderColor = '';
-            btn.style.color = '';
-            selected = selected.filter(function(s) { return s !== label; });
-          } else {
-            btn.dataset.selected = 'true';
-            btn.style.background = 'rgba(100,60,200,0.28)';
-            btn.style.borderColor = 'rgba(150,100,255,0.85)';
-            btn.style.color = '#c8aaff';
-            selected.push(label);
-          }
+} else {
+      // Single-select if contains "Surprise Me" (naming theme question)
+      var isSingleSelectGroup = bracketOptions.indexOf('Surprise Me') !== -1;
+      if (isSingleSelectGroup) {
+        bracketOptions.forEach(function(label) {
+          var btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = label;
+          btn.onclick = function() {
+            addMessage('user', label);
+            setSendDisabled(true);
+            disableOptions();
+            postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
+            pollEvents();
+          };
+          wrap.appendChild(btn);
+        });
+      } else {
+        // Pure multi-select (flavor buttons)
+        bracketOptions.forEach(function(label) {
+          var btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = label;
+          btn.onclick = function() {
+            if (btn.dataset.selected === 'true') {
+              btn.dataset.selected = 'false';
+              btn.style.background = '';
+              btn.style.borderColor = '';
+              btn.style.color = '';
+              selected = selected.filter(function(s) { return s !== label; });
+            } else {
+              btn.dataset.selected = 'true';
+              btn.style.background = 'rgba(100,60,200,0.28)';
+              btn.style.borderColor = 'rgba(150,100,255,0.85)';
+              btn.style.color = '#c8aaff';
+              selected.push(label);
+            }
+          };
+          wrap.appendChild(btn);
+        });
+
+        var confirmBtn = document.createElement('button');
+        confirmBtn.className = 'option-btn';
+        confirmBtn.textContent = '✓ Done';
+        confirmBtn.style.marginTop = '8px';
+        confirmBtn.onclick = function() {
+          if (selected.length === 0) return;
+          var txt = selected.join(', ');
+          addMessage('user', txt);
+          setSendDisabled(true);
+          disableOptions();
+          postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
+          pollEvents();
         };
-        wrap.appendChild(btn);
-      });
+        wrap.appendChild(confirmBtn);
+      }
 
-      var confirmBtn = document.createElement('button');
-      confirmBtn.className = 'option-btn';
-      confirmBtn.textContent = '✓ Done';
-      confirmBtn.style.marginTop = '8px';
-      confirmBtn.onclick = function() {
-        if (selected.length === 0) return;
-        var txt = selected.join(', ');
-        addMessage('user', txt);
-        setSendDisabled(true);
-        disableOptions();
-        postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
-        pollEvents();
-      };
-      wrap.appendChild(confirmBtn);
-    }
-
-    document.getElementById('messages').appendChild(wrap);
-    document.getElementById('messages').scrollTop = 9999;
-  }
-
-    // Only show Done button for multi-select groups
-    if (bracketOptions.length > 1) {
       var confirmBtn = document.createElement('button');
       confirmBtn.className = 'option-btn';
       confirmBtn.textContent = '✓ Done';
