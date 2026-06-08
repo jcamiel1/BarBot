@@ -271,7 +271,6 @@ function renderMessage(rawText) {
     if (questionText) addMessage('agent', questionText);
 
     var sliderLabels = ['Safe', 'Cautious', 'Balanced', 'Daring', 'Adventurous'];
-
     var wrap = document.createElement('div');
     wrap.className = 'slider-wrap';
 
@@ -319,7 +318,7 @@ function renderMessage(rawText) {
     return;
   }
 
-  // Extract all [bracket] tokens from the text
+  // Extract bracket tokens
   var bracketOptions = [];
   var bracketRegex = /\[([^\]]+)\]/g;
   var match;
@@ -327,7 +326,28 @@ function renderMessage(rawText) {
     bracketOptions.push(match[1]);
   }
 
-if (bracketOptions.length > 0) {
+  // Strip brackets and parse remaining lines
+  var cleanedText = bracketOptions.length > 0
+    ? text.replace(/\[([^\]]+)\]/g, '').trim()
+    : text;
+
+  var lines = cleanedText.split('\n');
+  var questionLines = [];
+  var optionLines = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (/^\d+\.\s/.test(line)) {
+      optionLines.push(line);
+    } else {
+      questionLines.push(lines[i]);
+    }
+  }
+
+  var questionText = questionLines.join('\n').trim();
+  if (questionText) addMessage('agent', questionText);
+
+  // Render bracket buttons
+  if (bracketOptions.length > 0) {
     var wrap = document.createElement('div');
     wrap.className = 'options-wrap';
     var selected = [];
@@ -458,7 +478,7 @@ if (bracketOptions.length > 0) {
     document.getElementById('messages').scrollTop = 9999;
   }
 
-  // Render numbered buttons (existing logic)
+  // Render numbered buttons
   if (optionLines.length > 0) {
     var wrap2 = document.createElement('div');
     wrap2.className = 'options-wrap';
@@ -478,7 +498,6 @@ if (bracketOptions.length > 0) {
     document.getElementById('messages').scrollTop = 9999;
   }
 }
-
 function disableOptions(){
   document.querySelectorAll('.option-btn').forEach(function(b){b.disabled=true;});
 }
