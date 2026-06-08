@@ -148,7 +148,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 <script>
 
 const BACKEND_URL='/api/cocktail';
-let sessionId=null,polling=false,globalLastTs=null;
+let sessionId=null,polling=false,globalLastTs=null,seenEventIds=new Set();
   
 async function beginSession(){
   var btn=document.getElementById('begin-btn');
@@ -209,11 +209,14 @@ async function pollEvents(){
   while(!idle){
     await sleep(1000);
     try{
-      var url=BACKEND_URL+'/events?session_id='+sessionId+(globalLastTs?'&after_ts='+encodeURIComponent(globalLastTs):'');
+      var url=BACKEND_URL+'/events?session_id='+sessionId;
       var res=await fetch(url);
       var data=await res.json();
+      var sawIdle=false;
       for(var i=0;i<(data.events||[]).length;i++){
         var ev=data.events[i];
+        if(seenEventIds.has(ev.id))continue;
+        seenEventIds.add(ev.id);
         if(ev.type==='agent.message'){
           for(var j=0;j<(ev.content||[]).length;j++){
             if(ev.content[j].type==='text')agentText+=ev.content[j].text;
@@ -228,9 +231,9 @@ async function pollEvents(){
             is_error:false
           });
         }
-        if(ev.type==='session.status_idle'){idle=true;}
+        if(ev.type==='session.status_idle'){sawIdle=true;}
       }
-      if(data.last_ts)globalLastTs=data.last_ts;
+      if(sawIdle)idle=true;
     }catch(err){
       console.error(err);idle=true;
     }
@@ -240,7 +243,7 @@ async function pollEvents(){
   setSendDisabled(false);
   polling=false;
 }
-
+  
 function cleanText(text){
   return text
     .replace(/\*\*(.*?)\*\*/g,'$1')
@@ -496,6 +499,7 @@ function closeTicket(){
   sessionId=null;
   polling=false;
   globalLastTs=null;
+  seenEventIds=new Set();
   document.getElementById('messages').innerHTML='';
   document.getElementById('user-input').value='';
   setSendDisabled(false);
