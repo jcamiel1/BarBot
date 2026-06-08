@@ -322,33 +322,16 @@ function renderMessage(rawText) {
     bracketOptions.push(match[1]);
   }
 
-  var cleanedText = bracketOptions.length > 0
-    ? text.replace(/\[([^\]]+)\]/g, '').replace(/\s+/g, ' ').trim()
-    : text;
-
-  var lines = cleanedText.split('\n');
-  var questionLines = [], optionLines = [];
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].trim();
-    if (/^\d+\.\s/.test(line)) { optionLines.push(line); }
-    else { questionLines.push(lines[i]); }
-  }
-
-  var questionText = questionLines.join('\n').trim();
-  if (questionText) addMessage('agent', questionText);
-
-  // Render bracket-style buttons
-  if (bracketOptions.length > 0) {
+if (bracketOptions.length > 0) {
     var wrap = document.createElement('div');
     wrap.className = 'options-wrap';
     var selected = [];
 
-    // Single-select mode: only one bracket option, OR one of the options is "None"
     var hasNone = bracketOptions.indexOf('None') !== -1;
-    var isSingleSelect = bracketOptions.length === 1 || hasNone;
+    var hasSurpriseMe = bracketOptions.indexOf('Surprise Me') !== -1;
 
-    if (isSingleSelect && !hasNone) {
-      // True single option — auto-submit on tap
+    if (bracketOptions.length === 1) {
+      // Single option — auto-submit on tap, no Done
       bracketOptions.forEach(function(label) {
         var btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -362,9 +345,25 @@ function renderMessage(rawText) {
         };
         wrap.appendChild(btn);
       });
+
+    } else if (hasSurpriseMe) {
+      // Naming theme — single-select, auto-submit, no Done
+      bracketOptions.forEach(function(label) {
+        var btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = label;
+        btn.onclick = function() {
+          addMessage('user', label);
+          setSendDisabled(true);
+          disableOptions();
+          postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
+          pollEvents();
+        };
+        wrap.appendChild(btn);
+      });
+
     } else if (hasNone) {
-      // Multi-select with a None escape hatch
-      // None auto-submits immediately; others are multi-select with Done
+      // Spirits to avoid — multi-select with Done, None auto-submits immediately
       bracketOptions.forEach(function(label) {
         var btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -396,7 +395,6 @@ function renderMessage(rawText) {
         }
         wrap.appendChild(btn);
       });
-
       var confirmBtn = document.createElement('button');
       confirmBtn.className = 'option-btn';
       confirmBtn.textContent = '✓ Done';
@@ -412,63 +410,29 @@ function renderMessage(rawText) {
       };
       wrap.appendChild(confirmBtn);
 
-} else {
-      // Single-select if contains "Surprise Me" (naming theme question)
-      var isSingleSelectGroup = bracketOptions.indexOf('Surprise Me') !== -1;
-      if (isSingleSelectGroup) {
-        bracketOptions.forEach(function(label) {
-          var btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.textContent = label;
-          btn.onclick = function() {
-            addMessage('user', label);
-            setSendDisabled(true);
-            disableOptions();
-            postEvent({ type: 'user.message', content: [{ type: 'text', text: label }] });
-            pollEvents();
-          };
-          wrap.appendChild(btn);
-        });
-      } else {
-        // Pure multi-select (flavor buttons)
-        bracketOptions.forEach(function(label) {
-          var btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.textContent = label;
-          btn.onclick = function() {
-            if (btn.dataset.selected === 'true') {
-              btn.dataset.selected = 'false';
-              btn.style.background = '';
-              btn.style.borderColor = '';
-              btn.style.color = '';
-              selected = selected.filter(function(s) { return s !== label; });
-            } else {
-              btn.dataset.selected = 'true';
-              btn.style.background = 'rgba(100,60,200,0.28)';
-              btn.style.borderColor = 'rgba(150,100,255,0.85)';
-              btn.style.color = '#c8aaff';
-              selected.push(label);
-            }
-          };
-          wrap.appendChild(btn);
-        });
-
-        var confirmBtn = document.createElement('button');
-        confirmBtn.className = 'option-btn';
-        confirmBtn.textContent = '✓ Done';
-        confirmBtn.style.marginTop = '8px';
-        confirmBtn.onclick = function() {
-          if (selected.length === 0) return;
-          var txt = selected.join(', ');
-          addMessage('user', txt);
-          setSendDisabled(true);
-          disableOptions();
-          postEvent({ type: 'user.message', content: [{ type: 'text', text: txt }] });
-          pollEvents();
+    } else {
+      // Pure multi-select — flavor buttons, one Done
+      bracketOptions.forEach(function(label) {
+        var btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = label;
+        btn.onclick = function() {
+          if (btn.dataset.selected === 'true') {
+            btn.dataset.selected = 'false';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            selected = selected.filter(function(s) { return s !== label; });
+          } else {
+            btn.dataset.selected = 'true';
+            btn.style.background = 'rgba(100,60,200,0.28)';
+            btn.style.borderColor = 'rgba(150,100,255,0.85)';
+            btn.style.color = '#c8aaff';
+            selected.push(label);
+          }
         };
-        wrap.appendChild(confirmBtn);
-      }
-
+        wrap.appendChild(btn);
+      });
       var confirmBtn = document.createElement('button');
       confirmBtn.className = 'option-btn';
       confirmBtn.textContent = '✓ Done';
