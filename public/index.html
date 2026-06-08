@@ -233,11 +233,13 @@ async function pollEvents(){
         }
         if(ev.type==='session.status_idle'){sawIdle=true;}
       }
-      if(sawIdle)idle=true;
+  if(sawIdle)idle=true;
+      console.log('poll batch', 'agentText:', agentText, 'sawIdle:', sawIdle);
     }catch(err){
       console.error(err);idle=true;
     }
   }
+  console.log('RENDER agentText:', agentText);
   showTyping(false);
   if(agentText)renderMessage(agentText);
   setSendDisabled(false);
